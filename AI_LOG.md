@@ -106,6 +106,21 @@ Dokumen ini disusun sebagai bentuk transparansi dan evaluasi kritis terhadap pen
 
 ---
 
+### Kasus 5: Sinkronisasi Relasi Many-to-Many `article_products` & Manajemen Section Landing Page
+* **Deskripsi Kebutuhan & Integrasi:**
+  Mengimplementasikan antarmuka CMS untuk Section Landing Page (Hero, Testimoni, FAQ) di `/admin/landing` dan memungkinkan tim marketing menautkan produk marketplace ke artikel blog serta menulis artikel dengan bantuan toolbar Rich-Text.
+* **Tantangan & Pengujian:**
+  1. Komponen `ImageUploader` pada awalnya memiliki batasan tipe folder `'products' | 'articles' | 'general'`. Saat digunakan untuk folder `'hero'` dan `'testimonials'`, TypeScript compiler mendeteksi ketidaksesuaian tipe (*type mismatch*).
+  2. Relasi `article_products` membutuhkan proses sinkronisasi atomik pada aksi `updateArticleAction` (menghapus relasi lama yang tidak lagi dipilih dan menyisipkan relasi baru).
+* **Bagaimana Diperbaiki:**
+  1. Memperluas tipe `folder` pada `ImageUploaderProps` menjadi `'products' | 'articles' | 'hero' | 'testimonials' | 'general' | (string & {})` sehingga aman secara tipe namun tetap fleksibel untuk folder baru.
+  2. Menyusun `RichTextEditor` dengan toolbar cepat (H2, H3, P, B, I, List, Link, Quote) dan Live Preview mode yang aman dari cascading re-render effect.
+  3. Memetakan `linked_product_ids` dari form checkbox ke tabel relasi PostgreSQL `article_products`.
+* **Verifikasi Hasil Akhir:**
+  Linting lolos 0 error dan `pnpm build` sukses mengkompilasi seluruh 14 rute dengan ISR dan On-Demand revalidation aktif.
+
+---
+
 ## 4. Bagian Implementasi yang Banyak Dibantu AI & Pengujian Edge Cases
 
 * **Fitur:** *Multi-Tier Product Promo Quota Accumulation Engine* di `entities/cart/model/cart-store.ts`.
