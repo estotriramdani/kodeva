@@ -2,11 +2,27 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import {
+  ShoppingBag,
+  CheckCircle2,
+  PackageCheck,
+  Mail,
+  MessageSquare,
+  AlertTriangle,
+  XCircle,
+  Smartphone,
+  Building2,
+  CreditCard,
+  Sparkles,
+  BarChart3,
+  Receipt,
+} from 'lucide-react';
 import { useCart } from '@/entities/cart';
 import { formatIDR } from '@/shared/lib';
 import { Container, Button, Input, Badge } from '@/shared/ui';
 import { getStoredUtmParams, type UtmParams } from '@/shared/lib/utm';
 import { sendGA4Event } from '@/shared/lib/analytics';
+import { CustomReceiptModal } from './CustomReceiptModal';
 
 type PaymentStatus = 'idle' | 'processing' | 'success' | 'failed';
 
@@ -23,6 +39,7 @@ export function CheckoutPage() {
   const [voucherMessage, setVoucherMessage] = useState<string | null>(null);
 
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('idle');
+  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
   const [orderResult, setOrderResult] = useState<{
     orderId: string;
     paidAt: string;
@@ -139,8 +156,8 @@ export function CheckoutPage() {
       <div className="py-16 sm:py-24">
         <Container>
           <div className="max-w-md mx-auto text-center bg-pure-white rounded-[50px] p-8 sm:p-12 border border-hairline-mist">
-            <div className="w-20 h-20 rounded-full bg-sandstone/70 flex items-center justify-center text-4xl mx-auto mb-5">
-              🛒
+            <div className="w-20 h-20 rounded-full bg-sandstone/70 flex items-center justify-center mx-auto mb-5 text-stone-gray">
+              <ShoppingBag className="w-10 h-10" />
             </div>
             <h1 className="text-[28px] font-medium text-ink-black">
               Keranjang Masih Kosong
@@ -167,8 +184,8 @@ export function CheckoutPage() {
           <div className="max-w-2xl mx-auto bg-pure-white rounded-[50px] p-6 sm:p-12 border border-hairline-mist text-ink-black shadow-xs">
             {/* Header Sukses */}
             <div className="text-center mb-8 pb-6 border-b border-hairline-mist">
-              <div className="w-20 h-20 rounded-full bg-fresh-grass/20 text-fresh-grass flex items-center justify-center text-4xl mx-auto mb-4 font-bold">
-                ✓
+              <div className="w-20 h-20 rounded-full bg-fresh-grass/20 text-fresh-grass flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-11 h-11" />
               </div>
               <Badge variant="neutral" className="bg-fresh-grass/20 text-ink-black font-semibold mb-2">
                 Status: Pembayaran Lunas (PAID)
@@ -187,14 +204,22 @@ export function CheckoutPage() {
             {/* Informasi Pengiriman Lisensi */}
             <div className="bg-cream-paper/70 rounded-[28px] p-5 sm:p-6 mb-6 border border-hairline-mist space-y-2">
               <h3 className="text-[16px] font-semibold text-ink-black flex items-center gap-2">
-                <span>📦</span> Aktivasi & Pengiriman Lisensi Instan
+                <PackageCheck className="w-5 h-5 text-fresh-grass" /> Aktivasi & Pengiriman Lisensi Instan
               </h3>
               <p className="text-[14px] text-ink-black/80 leading-relaxed">
                 Kunci lisensi (license key), tanda terima pembayaran, dan petunjuk aktivasi otomatis telah dikirimkan ke:
               </p>
-              <div className="text-[14px] font-medium bg-pure-white p-3 rounded-[16px] border border-hairline-mist/60 space-y-1">
-                <div>📧 Email: <strong className="text-ink-black">{orderResult.buyer.email}</strong></div>
-                <div>💬 WhatsApp: <strong className="text-ink-black">{orderResult.buyer.whatsapp}</strong></div>
+              <div className="text-[14px] font-medium bg-pure-white p-3.5 rounded-[16px] border border-hairline-mist/60 space-y-2">
+                <div className="flex items-center gap-2 text-stone-gray">
+                  <Mail className="w-4 h-4 text-stone-gray shrink-0" />
+                  <span>Email:</span>
+                  <strong className="text-ink-black">{orderResult.buyer.email}</strong>
+                </div>
+                <div className="flex items-center gap-2 text-stone-gray">
+                  <MessageSquare className="w-4 h-4 text-stone-gray shrink-0" />
+                  <span>WhatsApp:</span>
+                  <strong className="text-ink-black">{orderResult.buyer.whatsapp}</strong>
+                </div>
               </div>
             </div>
 
@@ -239,7 +264,7 @@ export function CheckoutPage() {
               </details>
             </div>
 
-            {/* Tombol Selesai */}
+            {/* Tombol Selesai & Lihat Tanda Terima */}
             <div className="flex flex-col sm:flex-row gap-3">
               <Link href="/" className="flex-1">
                 <Button variant="coral-pill" size="lg" className="w-full justify-center">
@@ -247,14 +272,23 @@ export function CheckoutPage() {
                 </Button>
               </Link>
               <button
-                onClick={() => window.print()}
-                className="px-6 py-3 rounded-full border border-hairline-mist font-medium hover:bg-cream-paper transition-colors text-center text-sm"
+                type="button"
+                onClick={() => setIsReceiptModalOpen(true)}
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-hairline-mist font-medium hover:bg-cream-paper transition-colors text-center text-sm cursor-pointer"
               >
-                🖨️ Cetak Tanda Terima
+                <Receipt className="w-4 h-4 text-ink-black" />
+                <span>Lihat Tanda Terima Resmi</span>
               </button>
             </div>
           </div>
         </Container>
+
+        {/* Custom Receipt Modal */}
+        <CustomReceiptModal
+          isOpen={isReceiptModalOpen}
+          onClose={() => setIsReceiptModalOpen(false)}
+          order={orderResult}
+        />
       </div>
     );
   }
@@ -289,7 +323,7 @@ export function CheckoutPage() {
         {paymentStatus === 'failed' && (
           <div className="mb-8 p-5 rounded-[28px] bg-coral-pop/15 border border-coral-pop/30 text-ink-black">
             <div className="flex items-start gap-3">
-              <span className="text-2xl">❌</span>
+              <XCircle className="w-6 h-6 text-coral-pop shrink-0 mt-0.5" />
               <div>
                 <h4 className="text-[17px] font-semibold text-coral-pop">
                   Simulasi Pembayaran Gagal / Ditolak
@@ -312,7 +346,7 @@ export function CheckoutPage() {
         {!validation.isValid && (
           <div className="mb-8 p-5 rounded-[28px] bg-coral-pop/10 border border-coral-pop/30 text-ink-black">
             <div className="flex items-start gap-3">
-              <span className="text-2xl">⚠️</span>
+              <AlertTriangle className="w-6 h-6 text-coral-pop shrink-0 mt-0.5" />
               <div>
                 <h4 className="text-[16px] font-semibold text-coral-pop">
                   Transaksi Tidak Dapat Dilanjutkan: Kelebihan Kuota Promo
@@ -394,7 +428,9 @@ export function CheckoutPage() {
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">📱</span>
+                    <div className="w-10 h-10 rounded-full bg-sandstone/60 flex items-center justify-center text-ink-black">
+                      <Smartphone className="w-5 h-5" />
+                    </div>
                     <div>
                       <strong className="text-[15px] text-ink-black block">QRIS Dinamis</strong>
                       <span className="text-[12px] text-stone-gray">
@@ -420,7 +456,9 @@ export function CheckoutPage() {
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">🏦</span>
+                    <div className="w-10 h-10 rounded-full bg-sandstone/60 flex items-center justify-center text-ink-black">
+                      <Building2 className="w-5 h-5" />
+                    </div>
                     <div>
                       <strong className="text-[15px] text-ink-black block">Virtual Account Bank</strong>
                       <span className="text-[12px] text-stone-gray">
@@ -446,7 +484,9 @@ export function CheckoutPage() {
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">💳</span>
+                    <div className="w-10 h-10 rounded-full bg-sandstone/60 flex items-center justify-center text-ink-black">
+                      <CreditCard className="w-5 h-5" />
+                    </div>
                     <div>
                       <strong className="text-[15px] text-ink-black block">Kartu Kredit / Debit Online</strong>
                       <span className="text-[12px] text-stone-gray">
@@ -468,7 +508,7 @@ export function CheckoutPage() {
             {/* Bagian 3: Simulator Pembayaran Frontend (Requirement B.5) */}
             <div className="bg-sandstone/40 rounded-[40px] p-6 sm:p-8 border border-hairline-mist">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">⚡</span>
+                <Sparkles className="w-5 h-5 text-fresh-grass" />
                 <h3 className="text-[18px] font-semibold text-ink-black">
                   Simulasi Pembayaran (Frontend Sandbox)
                 </h3>
@@ -483,9 +523,10 @@ export function CheckoutPage() {
                   size="lg"
                   disabled={paymentStatus === 'processing' || !validation.isValid}
                   onClick={() => handleSimulatePayment('success')}
-                  className="w-full justify-center bg-fresh-grass hover:bg-fresh-grass/90 text-ink-black font-bold py-4"
+                  className="w-full justify-center bg-fresh-grass hover:bg-fresh-grass/90 text-ink-black font-bold py-4 inline-flex items-center gap-2"
                 >
-                  {paymentStatus === 'processing' ? 'Memproses...' : '✓ Simulasikan Sukses'}
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>{paymentStatus === 'processing' ? 'Memproses...' : 'Simulasikan Sukses'}</span>
                 </Button>
 
                 <Button
@@ -493,9 +534,10 @@ export function CheckoutPage() {
                   size="lg"
                   disabled={paymentStatus === 'processing' || !validation.isValid}
                   onClick={() => handleSimulatePayment('failed')}
-                  className="w-full justify-center text-coral-pop border-coral-pop/40 hover:bg-coral-pop/10 py-4"
+                  className="w-full justify-center text-coral-pop border-coral-pop/40 hover:bg-coral-pop/10 py-4 inline-flex items-center gap-2"
                 >
-                  ✕ Simulasikan Gagal
+                  <XCircle className="w-4 h-4" />
+                  <span>Simulasikan Gagal</span>
                 </Button>
               </div>
             </div>
@@ -579,8 +621,8 @@ export function CheckoutPage() {
               {/* Card UTM Attribution Tracker (Requirement C.3) */}
               {utmParams && Object.keys(utmParams).length > 0 && (
                 <div className="mt-4 p-4 rounded-[20px] bg-sandstone/50 border border-hairline-mist/80 text-[12px]">
-                  <strong className="text-ink-black block mb-1">
-                    🎯 Atribusi Kampanye (UTM Tracker):
+                  <strong className="text-ink-black flex items-center gap-1.5 mb-1">
+                    <BarChart3 className="w-3.5 h-3.5 text-ink-black" /> Atribusi Kampanye (UTM Tracker):
                   </strong>
                   <div className="text-stone-gray space-y-0.5 font-mono text-[11px]">
                     {utmParams.utm_source && (
