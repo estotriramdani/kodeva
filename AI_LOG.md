@@ -73,6 +73,39 @@ Dokumen ini disusun sebagai bentuk transparansi dan evaluasi kritis terhadap pen
 
 ---
 
+### Kasus 3: Infinite Re-Render Loop pada `useSyncExternalStore` & `LeadForm`
+* **Deskripsi Kesalahan:**
+  Saat membuka modal *"Amankan Kuota Promo"*, browser mengalami error fatal:
+  `Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate.`
+* **Bagaimana Masalah Ditemukan:**
+  Error tertangkap langsung di runtime console browser saat tombol CTA di klik:
+  `features/claim-promo/ui/ClaimPromoButton.tsx (46:9) @ ClaimPromoButton -> <LeadForm>`
+* **Akar Masalah (Root Cause):**
+  Fungsi `getStoredUtmParams()` mengembalikan objek baru `{}` pada setiap pemanggilan saat data kosong. Ketika diikat ke hook `useSyncExternalStore(subscribeUtm, getStoredUtmParams)`, React mendeteksi bahwa referensi objek snapshot selalu berubah (`Object.is(prev, next) === false`), sehingga memicu render ulang tanpa henti (*infinite re-render loop*). Ditambah lagi callback `onSuccess={() => setIsOpen(false)}` di inline prop selalu dibuat ulang di setiap render.
+* **Bagaimana Diperbaiki:**
+  1. Menstabilkan snapshot referensial di `shared/lib/utm.ts` menggunakan static singleton `EMPTY_UTM` dan caching stringified snapshot `cachedSnapshot`.
+  2. Menyimpan callback `onSuccess` dalam `useRef` di `LeadForm.tsx` agar tidak memicu `useEffect` berulang.
+  3. Menerapkan lazy conditional rendering `{isOpen && <Modal ...>}` pada tombol-tombol pemicu modal agar form tidak di-mount saat modal sedang tertutup.
+* **Verifikasi Hasil Akhir:**
+  Modal terbuka secara instan dan form lead dapat diisi dengan mulus tanpa ada re-render berlebih.
+
+---
+
+### Kasus 4: Upload Media ke Supabase Storage Bucket & RLS Policy
+* **Deskripsi Kebutuhan & Integrasi:**
+  Fitur upload gambar untuk thumbnail produk dan cover artikel blog menggunakan Supabase Storage bucket `media` (publik, batas 2 MB, tipe: JPEG, PNG, WebP, AVIF).
+* **Tantangan & Pengujian:**
+  1. Bucket Supabase Storage dilindungi policy RLS `media_editor_all` yang mensyaratkan user memiliki profil `role in ('admin', 'editor')` di tabel `public.profiles`.
+  2. Pengecekan awal menemukan bahwa user admin di `auth.users` belum memiliki baris profil terhubung di `public.profiles`, sehingga upload awal ditolak dengan kode `403 AccessDenied`.
+* **Bagaimana Diperbaiki:**
+  1. Menghubungkan user admin ke `public.profiles` dengan role `admin` melalui query SQL berhak `postgres`.
+  2. Membangun modul `features/upload-media` dengan Server Action `uploadMediaAction` yang memanfaatkan `createServerClient` (membawa session cookies terotentikasi) dan komponen interaktif `ImageUploader` yang mendukung drag-and-drop, validasi 2 MB, preview instan, spinner loading, dan opsi fallback URL eksternal.
+  3. Mengintegrasikan `ImageUploader` pada modal tambah/edit produk di `AdminProductsPage` dan modal tambah/edit artikel di `AdminArticlesPage`.
+* **Verifikasi Hasil Akhir:**
+  Linting lolos 0 error dan `pnpm build` sukses mengkompilasi seluruh 13 rute.
+
+---
+
 ## 4. Bagian Implementasi yang Banyak Dibantu AI & Pengujian Edge Cases
 
 * **Fitur:** *Multi-Tier Product Promo Quota Accumulation Engine* di `entities/cart/model/cart-store.ts`.
