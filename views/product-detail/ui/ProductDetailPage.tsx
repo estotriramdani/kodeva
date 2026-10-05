@@ -5,6 +5,8 @@ import { Container, Card, Badge } from '@/shared/ui';
 import type { Product } from '@/entities/product';
 import { PricingTable } from '@/widgets/pricing-table';
 import { LeadForm } from '@/features/submit-lead';
+import { ProductOrderConfigurator } from './ProductOrderConfigurator';
+import { ProductViewTracker } from './ProductViewTracker';
 
 export interface ProductDetailPageProps {
   product: Product;
@@ -13,6 +15,9 @@ export interface ProductDetailPageProps {
 export function ProductDetailPage({ product }: ProductDetailPageProps) {
   return (
     <div className="py-8 sm:py-12">
+      {/* GA4 view_item tracking */}
+      <ProductViewTracker product={product} />
+
       <Container>
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="mb-6 text-[14px] text-stone-gray flex items-center gap-2">
@@ -28,7 +33,7 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
         </nav>
 
         {/* Hero Section Produk */}
-        <div className="bg-pure-white rounded-[50px] p-6 sm:p-12 border border-hairline-mist mb-12">
+        <div className="bg-pure-white rounded-[50px] p-6 sm:p-12 border border-hairline-mist mb-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
             {/* Informasi Detail */}
             <div>
@@ -93,6 +98,13 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
           </div>
         </div>
 
+        {/* Panel Interaktif Pemilihan Paket & Keranjang (Requirement B.2, B.3, B.4) */}
+        {product.plans && product.plans.length > 0 && (
+          <div className="mb-12">
+            <ProductOrderConfigurator product={product} />
+          </div>
+        )}
+
         {/* Deskripsi Lengkap */}
         {product.description && (
           <div className="bg-pure-white rounded-[50px] p-6 sm:p-12 border border-hairline-mist mb-12">
@@ -129,7 +141,7 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
           </div>
         )}
 
-        {/* Tabel Paket & Harga Lisensi */}
+        {/* Tabel Paket & Harga Lisensi (Perbandingan Fitur) */}
         {product.plans && product.plans.length > 0 && (
           <div className="mb-12">
             <PricingTable
@@ -145,15 +157,15 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
           <Card surface="white" className="p-8 sm:p-10 border border-hairline-mist">
             <div className="text-center mb-6">
               <h3 className="text-[26px] font-medium text-ink-black">
-                Tertarik dengan {product.name}?
+                Butuh Paket Kustom untuk {product.name}?
               </h3>
               <p className="text-[15px] text-stone-gray mt-2">
-                Dapatkan demo gratis atau konsultasikan penyesuaian paket sesuai anggaran perusahaan Anda.
+                Konsultasikan penyesuaian fitur, implementasi server on-premise, atau integrasi API khusus dengan spesialis kami.
               </p>
             </div>
             <LeadForm
               sourceCta={`product_detail_${product.slug}`}
-              submitButtonText={`Minta Penawaran ${product.name}`}
+              submitButtonText={`Minta Konsultasi ${product.name}`}
             />
           </Card>
         </div>

@@ -7,9 +7,11 @@ import { Button, Container, Modal } from '@/shared/ui';
 import { LeadForm } from '@/features/submit-lead';
 import { SITE_CONFIG } from '@/shared/config';
 import { cn } from '@/shared/lib';
+import { useCart } from '@/entities/cart';
 
 export function Header() {
   const pathname = usePathname();
+  const { isHydrated, summary, setDrawerOpen } = useCart();
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -61,8 +63,22 @@ export function Header() {
             })}
           </div>
 
-          {/* Action Area: Mobile Toggle & Quote CTA */}
-          <div className="flex items-center gap-2.5">
+          {/* Action Area: Cart, Mobile Toggle & Quote CTA */}
+          <div className="flex items-center gap-2">
+            {/* Tombol Keranjang */}
+            <button
+              onClick={() => setDrawerOpen(true)}
+              className="relative p-2.5 rounded-full hover:bg-cream-paper transition-colors flex items-center justify-center text-ink-black cursor-pointer"
+              aria-label={`Buka Keranjang: ${isHydrated ? summary.totalItems : 0} lisensi`}
+            >
+              <span className="text-lg">🛒</span>
+              {isHydrated && summary.totalItems > 0 && (
+                <span className="absolute 0 top-0.5 right-0.5 bg-coral-pop text-pure-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-1 border-pure-white">
+                  {summary.totalItems}
+                </span>
+              )}
+            </button>
+
             {/* CTA Penawaran Utama */}
             <Button
               variant="ghost-pill"
