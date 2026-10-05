@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createServerClient } from '@/shared/api/supabase/server';
+import { uploadMediaAction } from '@/features/upload-media';
 
 export interface ActionState {
   success?: boolean;
@@ -22,6 +23,22 @@ export async function createProductAction(
   const featuredRankRaw = formData.get('featured_rank') as string;
   const featuredRank = featuredRankRaw ? parseInt(featuredRankRaw, 10) : null;
   const featuresText = (formData.get('features') as string) || '';
+
+  let thumbnailUrl = (formData.get('thumbnail_url') as string)?.trim() || null;
+
+  // Cek apakah ada file thumbnail mentah yang dilampirkan via file input
+  const thumbnailFile = formData.get('thumbnail_file') as File | null;
+  if (thumbnailFile && thumbnailFile instanceof File && thumbnailFile.size > 0) {
+    const uploadForm = new FormData();
+    uploadForm.append('file', thumbnailFile);
+    uploadForm.append('folder', 'products');
+    const uploadRes = await uploadMediaAction(uploadForm);
+    if (uploadRes.success && uploadRes.url) {
+      thumbnailUrl = uploadRes.url;
+    } else if (uploadRes.error) {
+      return { error: `Gagal upload gambar thumbnail: ${uploadRes.error}` };
+    }
+  }
 
   // Parse features (1 per baris atau dipisah koma)
   const features = featuresText
@@ -48,6 +65,7 @@ export async function createProductAction(
       tagline,
       description,
       category_id: categoryId || null,
+      thumbnail_url: thumbnailUrl,
       promo_quota_remaining: promoQuota,
       featured_rank: featuredRank,
       features,
@@ -91,6 +109,90 @@ export async function createProductAction(
   return {
     success: true,
     message: `Produk "${name}" berhasil ditambahkan!`,
+  };
+}
+
+export async function updateProductAction(
+  prevState: ActionState | null,
+  formData: FormData
+): Promise<ActionState> {
+  const id = formData.get('id') as string;
+  const name = (formData.get('name') as string)?.trim();
+  const slug = (formData.get('slug') as string)?.trim().toLowerCase();
+  const tagline = (formData.get('tagline') as string)?.trim() || null;
+  const description = (formData.get('description') as string)?.trim() || '';
+  const categoryId = (formData.get('category_id') as string) || null;
+  const promoQuota = parseInt(formData.get('promo_quota_remaining') as string, 10) || 0;
+  const featuredRankRaw = formData.get('featured_rank') as string;
+  const featuredRank = featuredRankRaw ? parseInt(featuredRankRaw, 10) : null;
+  const featuresText = (formData.get('features') as string) || '';
+
+  let thumbnailUrl = (formData.get('thumbnail_url') as string)?.trim() || null;
+
+  // Cek apakah ada file thumbnail mentah yang diunggah
+  const thumbnailFile = formData.get('thumbnail_file') as File | null;
+  if (thumbnailFile && thumbnailFile instanceof File && thumbnailFile.size > 0) {
+    const uploadForm = new FormData();
+    uploadForm.append('file', thumbnailFile);
+    uploadForm.append('folder', 'products');
+    const uploadRes = await uploadMediaAction(uploadForm);
+    if (uploadRes.success && uploadRes.url) {
+      thumbnailUrl = uploadRes.url;
+    } else if (uploadRes.error) {
+      return { error: `Gagal upload gambar thumbnail: ${uploadRes.error}` };
+    }
+  }
+
+  if (!id) {
+    return { error: 'ID produk tidak ditemukan.' };
+  }
+
+  if (!name || !slug) {
+    return { error: 'Nama dan Slug produk wajib diisi.' };
+  }
+
+  if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)) {
+    return { error: 'Slug harus berupa huruf kecil, angka, dan tanda strip.' };
+  }
+
+  const features = featuresText
+    .split(/[\n,]/)
+    .map((f) => f.trim())
+    .filter(Boolean);
+
+  const supabase = await createServerClient();
+
+  const { error } = await supabase
+    .from('products')
+    .update({
+      name,
+      slug,
+      tagline,
+      description,
+      category_id: categoryId || null,
+      thumbnail_url: thumbnailUrl,
+      promo_quota_remaining: promoQuota,
+      featured_rank: featuredRank,
+      features,
+    })
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error updating product:', error.message);
+    if (error.code === '23505') {
+      return { error: 'Slug produk sudah digunakan oleh produk lain.' };
+    }
+    return { error: `Gagal memperbarui produk: ${error.message}` };
+  }
+
+  revalidatePath('/produk');
+  revalidatePath(`/produk/${slug}`);
+  revalidatePath('/admin/products');
+  revalidatePath('/');
+
+  return {
+    success: true,
+    message: `Produk "${name}" berhasil diperbarui!`,
   };
 }
 
