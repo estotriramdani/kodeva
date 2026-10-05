@@ -147,6 +147,7 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
             <PricingTable
               plans={product.plans}
               productName={product.name}
+              productId={product.id}
               promoQuota={product.promo_quota_remaining}
             />
           </div>
@@ -165,6 +166,7 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
             </div>
             <LeadForm
               sourceCta={`product_detail_${product.slug}`}
+              productId={product.id}
               submitButtonText={`Minta Konsultasi ${product.name}`}
             />
           </Card>

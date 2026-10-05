@@ -2,6 +2,7 @@
 
 import crypto from 'node:crypto';
 import { headers } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 import { createServerClient } from '@/shared/api/supabase/server';
 import { validateLeadInput, type CreateLeadInput } from '@/entities/lead';
 
@@ -9,6 +10,7 @@ export interface SubmitLeadState {
   success: boolean;
   message?: string;
   errors?: Record<string, string>;
+  remainingQuota?: number;
 }
 
 export async function submitLeadAction(
@@ -19,6 +21,7 @@ export async function submitLeadAction(
   const email = (formData.get('email') as string) || undefined;
   const whatsapp = (formData.get('whatsapp') as string) || undefined;
   const sourceCta = (formData.get('source_cta') as string) || undefined;
+  const productId = (formData.get('product_id') as string)?.trim() || undefined;
   const utmSource = (formData.get('utm_source') as string) || undefined;
   const utmMedium = (formData.get('utm_medium') as string) || undefined;
   const utmCampaign = (formData.get('utm_campaign') as string) || undefined;
@@ -62,6 +65,40 @@ export async function submitLeadAction(
 
   const supabase = await createServerClient();
 
+  // Pengurangan kuota promo atomik (mengatasi race condition di level DB) jika terkait produk promo
+  let promoSuccessNote = '';
+  let updatedRemaining: number | undefined;
+
+  if (productId) {
+    type ClaimRpcResponse = { success: boolean; remaining?: number; error?: string };
+    const { data: claimData, error: claimError } = await supabase.rpc(
+      'claim_product_promo_quota',
+      {
+        p_product_id: productId,
+        p_qty: 1,
+      }
+    );
+
+    if (claimError) {
+      console.error('Error claiming promo quota RPC:', claimError.message);
+    } else {
+      const claimResult = claimData as unknown as ClaimRpcResponse;
+      if (claimResult && !claimResult.success) {
+        return {
+          success: false,
+          message: claimResult.error || 'Mohon maaf, kuota promo untuk produk ini baru saja habis.',
+        };
+      }
+      if (claimResult?.remaining !== undefined) {
+        updatedRemaining = claimResult.remaining;
+        promoSuccessNote = ` 1 kuota promo berhasil diamankan untuk Anda (Sisa kuota: ${claimResult.remaining}).`;
+      }
+      revalidatePath('/');
+      revalidatePath('/produk');
+      revalidatePath('/produk/[slug]');
+    }
+  }
+
   const { error } = await supabase.from('leads').insert({
     name: rawInput.name.trim(),
     email: rawInput.email?.trim() || null,
@@ -102,6 +139,7 @@ export async function submitLeadAction(
 
   return {
     success: true,
-    message: 'Terima kasih! Permintaan penawaran Anda telah berhasil kami terima.',
+    message: `Terima kasih! Permintaan penawaran Anda telah berhasil kami terima.${promoSuccessNote}`,
+    remainingQuota: updatedRemaining,
   };
 }

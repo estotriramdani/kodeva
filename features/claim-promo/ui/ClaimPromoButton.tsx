@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
+import { Tag } from 'lucide-react';
 import { Button, Modal } from '@/shared/ui';
 import { LeadForm } from '@/features/submit-lead';
 
 export interface ClaimPromoButtonProps {
   productName: string;
+  productId?: string;
   planTier?: string;
   quotaRemaining?: number;
   className?: string;
@@ -13,6 +15,7 @@ export interface ClaimPromoButtonProps {
 
 export function ClaimPromoButton({
   productName,
+  productId,
   planTier,
   quotaRemaining,
   className,
@@ -33,7 +36,10 @@ export function ClaimPromoButton({
         onClick={handleOpen}
         className={className}
       >
-        Klaim Promo {tierTitle}
+        <span className="flex items-center gap-1.5">
+          <Tag className="w-3.5 h-3.5" />
+          <span>Klaim Promo {tierTitle}</span>
+        </span>
       </Button>
 
       {isOpen && (
@@ -43,12 +49,13 @@ export function ClaimPromoButton({
           title={`Klaim Promo ${productName}`}
           description={
             quotaRemaining && quotaRemaining > 0
-              ? `Tersisa ${quotaRemaining} kuota diskon untuk promo ini. Isi kontak Anda di bawah:`
+              ? `Tersisa ${quotaRemaining} kuota diskon untuk promo ini. Isi kontak Anda di bawah untuk mengamankan 1 kuota promo:`
               : `Dapatkan penawaran harga diskon khusus untuk ${productName} ${tierTitle}:`
           }
         >
           <LeadForm
             sourceCta={sourceCta}
+            productId={productId}
             onSuccess={handleClose}
             submitButtonText="Amankan Kuota Promo Sekarang"
           />

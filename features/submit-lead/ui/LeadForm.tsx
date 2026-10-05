@@ -1,12 +1,14 @@
 'use client';
 
 import React, { useActionState, useEffect } from 'react';
+import { CheckCircle2, ShieldCheck } from 'lucide-react';
 import { Button, Input } from '@/shared/ui';
 import { getStoredUtmParams } from '@/shared/lib/utm';
 import { submitLeadAction, type SubmitLeadState } from '../api/submit-lead.action';
 
 export interface LeadFormProps {
   sourceCta?: string;
+  productId?: string;
   onSuccess?: () => void;
   submitButtonText?: string;
   className?: string;
@@ -20,6 +22,7 @@ const emptySubscribe = () => () => {};
 
 export function LeadForm({
   sourceCta = 'website_cta',
+  productId,
   onSuccess,
   submitButtonText = 'Minta Penawaran Harga',
   className,
@@ -45,11 +48,10 @@ export function LeadForm({
     }
   }, [state.success]);
 
-
   if (state.success) {
     return (
       <div className="text-center py-6 px-4 bg-fresh-grass/15 rounded-[24px] border border-fresh-grass/40">
-        <span className="text-3xl block mb-2">🎉</span>
+        <CheckCircle2 className="w-9 h-9 text-fresh-grass mx-auto mb-2" />
         <h4 className="text-[20px] font-semibold text-ink-black mb-1">
           Permintaan Terkirim!
         </h4>
@@ -63,6 +65,7 @@ export function LeadForm({
   return (
     <form action={formAction} className={`space-y-4 ${className || ''}`}>
       <input type="hidden" name="source_cta" value={sourceCta} />
+      <input type="hidden" name="product_id" value={productId || ''} />
       <input
         type="hidden"
         name="landing_path"
@@ -127,9 +130,10 @@ export function LeadForm({
         </Button>
       </div>
 
-      <p className="text-[12px] text-stone-gray text-center leading-tight">
-        🔒 Data kontak Anda aman dan hanya digunakan untuk keperluan penawaran resmi.
-      </p>
+      <div className="flex items-center justify-center gap-1.5 text-[12px] text-stone-gray text-center leading-tight">
+        <ShieldCheck className="w-3.5 h-3.5 text-stone-gray/80" />
+        <span>Data kontak Anda aman dan hanya digunakan untuk keperluan penawaran resmi.</span>
+      </div>
     </form>
   );
 }

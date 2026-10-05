@@ -6,12 +6,14 @@ import { ClaimPromoButton } from '@/features/claim-promo';
 export interface PricingTableProps {
   plans: ProductPlan[];
   productName: string;
+  productId?: string;
   promoQuota?: number;
 }
 
 export function PricingTable({
   plans,
   productName,
+  productId,
   promoQuota,
 }: PricingTableProps) {
   if (!plans || plans.length === 0) return null;
@@ -39,6 +41,7 @@ export function PricingTable({
                 actionSlot={
                   <ClaimPromoButton
                     productName={productName}
+                    productId={productId || plans[0]?.product_id}
                     planTier={plan.tier}
                     quotaRemaining={promoQuota}
                     className="w-full justify-center"

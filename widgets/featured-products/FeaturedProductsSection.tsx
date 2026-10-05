@@ -47,6 +47,7 @@ export function FeaturedProductsSection({
                 product.promo_quota_remaining > 0 ? (
                   <ClaimPromoButton
                     productName={product.name}
+                    productId={product.id}
                     quotaRemaining={product.promo_quota_remaining}
                   />
                 ) : undefined

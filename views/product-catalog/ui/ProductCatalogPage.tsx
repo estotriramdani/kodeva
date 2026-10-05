@@ -4,6 +4,7 @@ import { ProductCard, type Product } from '@/entities/product';
 import type { Category } from '@/entities/category';
 import { CategoryFilterPills, ProductSearchBar } from '@/features/filter-products';
 import { ClaimPromoButton } from '@/features/claim-promo';
+import { Search } from 'lucide-react';
 
 export interface ProductCatalogPageProps {
   products: Product[];
@@ -51,6 +52,7 @@ export function ProductCatalogPage({
                   product.promo_quota_remaining > 0 ? (
                     <ClaimPromoButton
                       productName={product.name}
+                      productId={product.id}
                       quotaRemaining={product.promo_quota_remaining}
                     />
                   ) : undefined
@@ -60,7 +62,7 @@ export function ProductCatalogPage({
           </div>
         ) : (
           <div className="text-center py-20 bg-pure-white rounded-[50px] p-8 border border-hairline-mist max-w-xl mx-auto">
-            <span className="text-4xl block mb-3">🔍</span>
+            <Search className="w-10 h-10 text-stone-gray/60 mx-auto mb-3" />
             <h3 className="text-[22px] font-medium text-ink-black mb-2">
               Tidak Ada Produk yang Sesuai
             </h3>
