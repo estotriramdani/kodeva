@@ -40,9 +40,9 @@ app/
 └── middleware.ts                  # Proteksi rute admin & refresh session Supabase
 ```
 
-Padanan di layer `pages/`:
+> **Catatan Implementasi**: Pada Next.js 16 App Router, layer `pages/` dipetakan ke direktori `views/` (`@/views/*`) untuk mencegah konflik dengan Pages Router bawaan Next.js.
 ```
-pages/
+views/
 ├── home/
 │   ├── index.ts
 │   └── ui/HomePage.tsx
@@ -59,6 +59,7 @@ pages/
 │   ├── index.ts
 │   └── ui/ArticleDetailPage.tsx
 └── admin/
+    ├── index.ts
     ├── login/ui/AdminLoginPage.tsx
     └── dashboard/ui/AdminDashboardPage.tsx
 ```
@@ -71,8 +72,8 @@ pages/
 Di Next.js 16, `params` dan `searchParams` bersifat `Promise` yang harus di-`await`:
 ```tsx
 // app/(marketing)/produk/[slug]/page.tsx
-import { ProductDetailPage } from '@/pages/product-detail';
-import { getProductBySlug } from '@/entities/product';
+import { ProductDetailPage } from '@/views/product-detail';
+import { getProductBySlug } from '@/entities/product/server';
 import type { Metadata } from 'next';
 
 type Props = {
@@ -111,7 +112,7 @@ Menggunakan helper dari `@/shared/api/supabase/middleware` untuk:
 
 ## 4. Checklist Verifikasi Tahap Pages & App
 
-- [ ] Setiap file `app/**/page.tsx` berukuran ringkas (< 40 baris kode).
-- [ ] Metadata dinamis (OpenGraph, Twitter card, Title) terbentuk sempurna di halaman produk dan artikel.
-- [ ] Middleware me-redirect pengunjung yang belum login saat mencoba mengakses `/admin/dashboard`.
-- [ ] Navigasi antar-halaman berjalan lancar dengan transisi mulus dan SSR optimal.
+- [x] Setiap file `app/**/page.tsx` berukuran ringkas (< 40 baris kode).
+- [x] Metadata dinamis (OpenGraph, Twitter card, Title) terbentuk sempurna di halaman produk dan artikel.
+- [x] Middleware me-redirect pengunjung yang belum login saat mencoba mengakses `/admin/dashboard`.
+- [x] Navigasi antar-halaman berjalan lancar dengan transisi mulus dan SSR optimal.
