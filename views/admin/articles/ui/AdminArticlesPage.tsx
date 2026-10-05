@@ -8,16 +8,19 @@ import {
   createArticleAction,
   updateArticleAction,
   deleteArticleAction,
+  RichTextEditor,
   type ActionState,
 } from '@/features/manage-articles';
 import { ImageUploader } from '@/features/upload-media';
 import { formatDateID } from '@/shared/lib';
 import type { Article } from '@/entities/article';
 import type { Category } from '@/entities/category';
+import type { Product } from '@/entities/product';
 
 export interface AdminArticlesPageProps {
   articles: Article[];
   categories: Category[];
+  products?: Product[];
 }
 
 const initialActionState: ActionState = {};
@@ -25,6 +28,7 @@ const initialActionState: ActionState = {};
 export function AdminArticlesPage({
   articles,
   categories,
+  products = [],
 }: AdminArticlesPageProps) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
@@ -65,7 +69,7 @@ export function AdminArticlesPage({
             Artikel & Edukasi Blog
           </h1>
           <p className="text-[15px] text-stone-gray mt-1">
-            Tulis dan publikasikan panduan komparasi software dengan upload cover gambar Supabase Storage.
+            Tulis ulasan software, tautkan produk marketplace, dan upload cover Supabase Storage.
           </p>
         </div>
 
@@ -94,6 +98,7 @@ export function AdminArticlesPage({
                   <th className="pb-3 pr-4">Cover</th>
                   <th className="pb-3 pr-4">Judul</th>
                   <th className="pb-3 pr-4">Kategori</th>
+                  <th className="pb-3 pr-4">Produk Tertaut</th>
                   <th className="pb-3 pr-4">Status</th>
                   <th className="pb-3 pr-4">Penulis</th>
                   <th className="pb-3 pr-4">Tanggal Terbit</th>
@@ -134,6 +139,15 @@ export function AdminArticlesPage({
                         <Badge variant="neutral">{article.category.name}</Badge>
                       ) : (
                         <span className="text-stone-gray">-</span>
+                      )}
+                    </td>
+                    <td className="py-3.5 pr-4">
+                      {article.linked_product_ids && article.linked_product_ids.length > 0 ? (
+                        <Badge variant="coral">
+                          📦 {article.linked_product_ids.length} Produk
+                        </Badge>
+                      ) : (
+                        <span className="text-stone-gray text-[13px]">-</span>
                       )}
                     </td>
                     <td className="py-3.5 pr-4">
@@ -197,7 +211,7 @@ export function AdminArticlesPage({
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
           title="Tulis Artikel Baru"
-          description="Publikasikan ulasan komparasi software bisnis dan upload gambar cover ke Supabase Storage."
+          description="Publikasikan ulasan komparasi software bisnis dan tautkan produk marketplace Kodeva."
           maxWidth="lg"
         >
           <form action={createAction} className="space-y-4">
@@ -281,6 +295,51 @@ export function AdminArticlesPage({
               />
             </div>
 
+            {/* Tautkan Produk Marketplace */}
+            {products.length > 0 && (
+              <div className="p-4 rounded-[24px] bg-cream-paper border border-hairline-mist space-y-2.5">
+                <div>
+                  <label className="block text-[14px] font-semibold text-ink-black">
+                    Tautkan Produk dari Marketplace
+                  </label>
+                  <p className="text-[12px] text-stone-gray">
+                    Produk yang dipilih akan tampil sebagai rekomendasi langsung di bagian bawah artikel.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+                  {products.map((prod) => (
+                    <label
+                      key={prod.id}
+                      className="flex items-center gap-3 p-2 rounded-[16px] bg-pure-white border border-hairline-mist/60 hover:border-fresh-grass cursor-pointer transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        name="linked_product_ids"
+                        value={prod.id}
+                        className="w-4 h-4 rounded text-fresh-grass focus:ring-fresh-grass"
+                      />
+                      <div className="relative w-8 h-8 rounded-[8px] bg-sandstone overflow-hidden shrink-0">
+                        {prod.thumbnail_url ? (
+                          <Image src={prod.thumbnail_url} alt={prod.name} fill className="object-cover" />
+                        ) : (
+                          <span className="text-[10px] font-bold text-stone-gray flex items-center justify-center h-full">📦</span>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <span className="text-[13px] font-medium text-ink-black block truncate">
+                          {prod.name}
+                        </span>
+                        <span className="text-[11px] text-stone-gray font-mono block truncate">
+                          /produk/{prod.slug}
+                        </span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <Textarea
               name="excerpt"
               label="Ringkasan Singkat (Excerpt)"
@@ -289,11 +348,12 @@ export function AdminArticlesPage({
               disabled={isCreating}
             />
 
-            <Textarea
+            {/* Rich Text Editor dengan Toolbar & Live Preview */}
+            <RichTextEditor
               name="content_html"
-              label="Konten HTML Artikel"
-              placeholder="<p>Isi artikel dalam format HTML...</p>&#10;<h2>1. Mekari Jurnal</h2>&#10;<p>Fitur utama meliputi...</p>"
-              rows={6}
+              label="Konten Artikel (Rich Text HTML)"
+              placeholder="<p>Mulai tulis ulasan komparasi software di sini...</p>"
+              rows={7}
               disabled={isCreating}
             />
 
@@ -323,7 +383,7 @@ export function AdminArticlesPage({
           isOpen={Boolean(editingArticle)}
           onClose={() => setEditingArticle(null)}
           title={`Edit Artikel: ${editingArticle.title}`}
-          description="Perbarui konten artikel blog, ganti gambar cover, atau ubah status publikasi."
+          description="Perbarui konten artikel blog, ganti gambar cover, atau tautkan produk marketplace."
           maxWidth="lg"
         >
           <form action={updateAction} className="space-y-4">
@@ -410,6 +470,52 @@ export function AdminArticlesPage({
               />
             </div>
 
+            {/* Tautkan Produk Marketplace */}
+            {products.length > 0 && (
+              <div className="p-4 rounded-[24px] bg-cream-paper border border-hairline-mist space-y-2.5">
+                <div>
+                  <label className="block text-[14px] font-semibold text-ink-black">
+                    Tautkan Produk dari Marketplace
+                  </label>
+                  <p className="text-[12px] text-stone-gray">
+                    Pilih produk yang direkomendasikan pada artikel ini.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+                  {products.map((prod) => (
+                    <label
+                      key={prod.id}
+                      className="flex items-center gap-3 p-2 rounded-[16px] bg-pure-white border border-hairline-mist/60 hover:border-fresh-grass cursor-pointer transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        name="linked_product_ids"
+                        value={prod.id}
+                        defaultChecked={editingArticle.linked_product_ids?.includes(prod.id)}
+                        className="w-4 h-4 rounded text-fresh-grass focus:ring-fresh-grass"
+                      />
+                      <div className="relative w-8 h-8 rounded-[8px] bg-sandstone overflow-hidden shrink-0">
+                        {prod.thumbnail_url ? (
+                          <Image src={prod.thumbnail_url} alt={prod.name} fill className="object-cover" />
+                        ) : (
+                          <span className="text-[10px] font-bold text-stone-gray flex items-center justify-center h-full">📦</span>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <span className="text-[13px] font-medium text-ink-black block truncate">
+                          {prod.name}
+                        </span>
+                        <span className="text-[11px] text-stone-gray font-mono block truncate">
+                          /produk/{prod.slug}
+                        </span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <Textarea
               name="excerpt"
               label="Ringkasan Singkat (Excerpt)"
@@ -418,11 +524,12 @@ export function AdminArticlesPage({
               disabled={isUpdating}
             />
 
-            <Textarea
+            {/* Rich Text Editor dengan Toolbar & Live Preview */}
+            <RichTextEditor
               name="content_html"
-              label="Konten HTML Artikel"
+              label="Konten Artikel (Rich Text HTML)"
               defaultValue={editingArticle.content_html || ''}
-              rows={6}
+              rows={7}
               disabled={isUpdating}
             />
 

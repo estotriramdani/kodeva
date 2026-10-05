@@ -9,4 +9,5 @@ export interface Article extends ArticleRow {
     slug: string;
     name: string;
   } | null;
+  linked_product_ids?: string[];
 }

@@ -24,6 +24,8 @@ export async function createArticleAction(
   const authorName = (formData.get('author_name') as string)?.trim() || 'Tim Editorial Kodeva';
   const coverAlt = (formData.get('cover_alt') as string)?.trim() || title || null;
 
+  const linkedProductIds = formData.getAll('linked_product_ids') as string[];
+
   let coverUrl = (formData.get('cover_url') as string)?.trim() || null;
 
   // Cek apakah ada file cover mentah yang dilampirkan via input file
@@ -50,18 +52,22 @@ export async function createArticleAction(
 
   const supabase = await createServerClient();
 
-  const { error } = await supabase.from('articles').insert({
-    title,
-    slug,
-    excerpt,
-    content_html: contentHtml,
-    category_id: categoryId || null,
-    cover_url: coverUrl,
-    cover_alt: coverAlt,
-    status,
-    author_name: authorName,
-    market_code: 'id',
-  });
+  const { data: newArticle, error } = await supabase
+    .from('articles')
+    .insert({
+      title,
+      slug,
+      excerpt,
+      content_html: contentHtml,
+      category_id: categoryId || null,
+      cover_url: coverUrl,
+      cover_alt: coverAlt,
+      status,
+      author_name: authorName,
+      market_code: 'id',
+    })
+    .select('id')
+    .single();
 
   if (error) {
     console.error('Error creating article:', error.message);
@@ -71,7 +77,29 @@ export async function createArticleAction(
     return { error: `Gagal menerbitkan artikel: ${error.message}` };
   }
 
+  // Tautkan produk marketplace jika dipilih
+  if (newArticle?.id && linkedProductIds.length > 0) {
+    const relations = linkedProductIds
+      .filter(Boolean)
+      .map((productId, index) => ({
+        article_id: newArticle.id,
+        product_id: productId,
+        rank: index + 1,
+      }));
+
+    if (relations.length > 0) {
+      const { error: linkError } = await supabase
+        .from('article_products')
+        .insert(relations);
+
+      if (linkError) {
+        console.error('Error linking products to article:', linkError.message);
+      }
+    }
+  }
+
   revalidatePath('/artikel');
+  revalidatePath(`/artikel/${slug}`);
   revalidatePath('/admin/articles');
   revalidatePath('/');
 
@@ -94,6 +122,8 @@ export async function updateArticleAction(
   const status = ((formData.get('status') as string) || 'published') as ArticleStatus;
   const authorName = (formData.get('author_name') as string)?.trim() || 'Tim Editorial Kodeva';
   const coverAlt = (formData.get('cover_alt') as string)?.trim() || title || null;
+
+  const linkedProductIds = formData.getAll('linked_product_ids') as string[];
 
   let coverUrl = (formData.get('cover_url') as string)?.trim() || null;
 
@@ -146,6 +176,26 @@ export async function updateArticleAction(
       return { error: 'Slug artikel ini sudah digunakan oleh artikel lain.' };
     }
     return { error: `Gagal memperbarui artikel: ${error.message}` };
+  }
+
+  // Sinkronkan penautan produk marketplace (hapus relasi lama, masukkan relasi baru)
+  await supabase.from('article_products').delete().eq('article_id', id);
+
+  const cleanProductIds = linkedProductIds.filter(Boolean);
+  if (cleanProductIds.length > 0) {
+    const relations = cleanProductIds.map((productId, index) => ({
+      article_id: id,
+      product_id: productId,
+      rank: index + 1,
+    }));
+
+    const { error: linkError } = await supabase
+      .from('article_products')
+      .insert(relations);
+
+    if (linkError) {
+      console.error('Error updating article products:', linkError.message);
+    }
   }
 
   revalidatePath('/artikel');

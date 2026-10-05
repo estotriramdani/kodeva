@@ -26,6 +26,11 @@ export function AdminSidebar({
       badge: 'Utama',
     },
     {
+      href: '/admin/landing',
+      label: 'Konten Landing',
+      icon: '🎨',
+    },
+    {
       href: '/admin/products',
       label: 'Katalog Produk',
       icon: '📦',

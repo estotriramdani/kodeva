@@ -8,7 +8,7 @@ import { uploadMediaAction } from '../api/upload.actions';
 export interface ImageUploaderProps {
   name: string; // Form input name, e.g. 'thumbnail_url' or 'cover_url'
   label: string;
-  folder: 'products' | 'articles' | 'general';
+  folder: 'products' | 'articles' | 'hero' | 'testimonials' | 'general' | (string & {});
   defaultValue?: string | null;
   helperText?: string;
   required?: boolean;
