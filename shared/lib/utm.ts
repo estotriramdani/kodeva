@@ -12,6 +12,10 @@ export interface UtmParams {
 }
 
 const STORAGE_KEY = 'kodeva_utm_attribution_v1';
+export const EMPTY_UTM: UtmParams = Object.freeze({});
+
+let cachedRaw: string | null = null;
+let cachedSnapshot: UtmParams = EMPTY_UTM;
 
 /**
  * Tangkap parameter UTM dari URL saat ini dan simpan ke sessionStorage.
@@ -43,15 +47,21 @@ export function captureUtmParams(): UtmParams | null {
         captured_at: new Date().toISOString(),
       };
 
-      // Simpan di sessionStorage
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(newUtm));
+      const raw = JSON.stringify(newUtm);
+      sessionStorage.setItem(STORAGE_KEY, raw);
+      cachedRaw = raw;
+      cachedSnapshot = newUtm;
       return newUtm;
     }
 
     // Jika tidak ada UTM di URL, ambil dari sessionStorage yang sudah tersimpan
     const saved = sessionStorage.getItem(STORAGE_KEY);
     if (saved) {
-      return JSON.parse(saved) as UtmParams;
+      if (saved !== cachedRaw) {
+        cachedRaw = saved;
+        cachedSnapshot = JSON.parse(saved) as UtmParams;
+      }
+      return cachedSnapshot;
     }
   } catch (err) {
     console.error('Error handling UTM attribution:', err);
@@ -62,18 +72,20 @@ export function captureUtmParams(): UtmParams | null {
 
 /**
  * Ambil parameter UTM aktif dari sessionStorage.
+ * Dijamin memiliki referensi stabil (referentially stable) untuk mencegah re-render loop di useSyncExternalStore.
  */
 export function getStoredUtmParams(): UtmParams {
-  if (typeof window === 'undefined') return {};
+  if (typeof window === 'undefined') return EMPTY_UTM;
 
   try {
     const saved = sessionStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      return JSON.parse(saved) as UtmParams;
+    if (saved === cachedRaw) {
+      return cachedSnapshot;
     }
-  } catch (err) {
-    console.error('Error reading stored UTM params:', err);
+    cachedRaw = saved;
+    cachedSnapshot = saved ? (JSON.parse(saved) as UtmParams) : EMPTY_UTM;
+    return cachedSnapshot;
+  } catch {
+    return EMPTY_UTM;
   }
-
-  return {};
 }

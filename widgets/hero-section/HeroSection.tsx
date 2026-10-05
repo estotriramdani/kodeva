@@ -79,18 +79,20 @@ export function HeroSection({ heroData }: HeroSectionProps) {
       </Container>
 
       {/* Hero Quote Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Dapatkan Penawaran Promo"
-        description="Konsultasikan kebutuhan software bisnis Anda secara gratis dan dapatkan kuota promo eksklusif."
-      >
-        <LeadForm
-          sourceCta="hero_promo_button"
-          onSuccess={() => setIsModalOpen(false)}
-          submitButtonText="Amankan Penawaran Promo"
-        />
-      </Modal>
+      {isModalOpen && (
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title="Dapatkan Penawaran Promo"
+          description="Konsultasikan kebutuhan software bisnis Anda secara gratis dan dapatkan kuota promo eksklusif."
+        >
+          <LeadForm
+            sourceCta="hero_promo_button"
+            onSuccess={() => setIsModalOpen(false)}
+            submitButtonText="Amankan Penawaran Promo"
+          />
+        </Modal>
+      )}
     </section>
   );
 }

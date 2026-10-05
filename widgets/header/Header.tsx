@@ -120,18 +120,20 @@ export function Header() {
       </Container>
 
       {/* Global Quote Modal */}
-      <Modal
-        isOpen={isQuoteModalOpen}
-        onClose={() => setIsQuoteModalOpen(false)}
-        title="Minta Penawaran Software"
-        description="Ceritakan kebutuhan software Anda, kami bantu berikan rekomendasi harga terbaik dan kuota promo."
-      >
-        <LeadForm
-          sourceCta="header_quote_button"
-          onSuccess={() => setIsQuoteModalOpen(false)}
-          submitButtonText="Kirim Permintaan Penawaran"
-        />
-      </Modal>
+      {isQuoteModalOpen && (
+        <Modal
+          isOpen={isQuoteModalOpen}
+          onClose={() => setIsQuoteModalOpen(false)}
+          title="Minta Penawaran Software"
+          description="Ceritakan kebutuhan software Anda, kami bantu berikan rekomendasi harga terbaik dan kuota promo."
+        >
+          <LeadForm
+            sourceCta="header_quote_button"
+            onSuccess={() => setIsQuoteModalOpen(false)}
+            submitButtonText="Kirim Permintaan Penawaran"
+          />
+        </Modal>
+      )}
     </header>
   );
 }

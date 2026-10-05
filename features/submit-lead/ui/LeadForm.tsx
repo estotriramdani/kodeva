@@ -31,14 +31,20 @@ export function LeadForm({
     () => ({})
   );
 
+  const onSuccessRef = React.useRef(onSuccess);
   useEffect(() => {
-    if (state.success && onSuccess) {
+    onSuccessRef.current = onSuccess;
+  });
+
+  useEffect(() => {
+    if (state.success && onSuccessRef.current) {
       const timer = setTimeout(() => {
-        onSuccess();
+        onSuccessRef.current?.();
       }, 1500);
       return () => clearTimeout(timer);
     }
-  }, [state.success, onSuccess]);
+  }, [state.success]);
+
 
   if (state.success) {
     return (
