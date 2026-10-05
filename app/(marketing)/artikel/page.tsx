@@ -10,8 +10,21 @@ export const metadata: Metadata = {
 
 export const revalidate = 120;
 
-export default async function Page() {
-  const articles = await getPublishedArticles();
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page } = await searchParams;
+  const pageNumber = Math.max(1, parseInt(page || '1', 10) || 1);
+  const result = await getPublishedArticles({ page: pageNumber, pageSize: 6 });
 
-  return <ArticleListPage articles={articles} />;
+  return (
+    <ArticleListPage
+      articles={result.articles}
+      currentPage={result.currentPage}
+      totalPages={result.totalPages}
+    />
+  );
 }
+

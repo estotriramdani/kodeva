@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArticleDetailPage } from '@/views/article-detail';
-import { getArticleBySlug } from '@/entities/article/server';
+import { getArticleBySlug, getArticleLinkedProducts } from '@/entities/article/server';
 
 type Props = {
   params: Promise<{
@@ -38,5 +38,8 @@ export default async function Page({ params }: Props) {
     notFound();
   }
 
-  return <ArticleDetailPage article={article} />;
+  const linkedProducts = await getArticleLinkedProducts(article.id);
+
+  return <ArticleDetailPage article={article} linkedProducts={linkedProducts} />;
 }
+

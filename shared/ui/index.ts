@@ -4,3 +4,4 @@ export * from './badge';
 export * from './input';
 export * from './container';
 export * from './modal';
+export * from './UtmTracker';

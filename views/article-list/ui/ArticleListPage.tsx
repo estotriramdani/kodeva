@@ -1,12 +1,19 @@
 import React from 'react';
-import { Container } from '@/shared/ui';
+import Link from 'next/link';
+import { Container, Button } from '@/shared/ui';
 import { ArticleCard, type Article } from '@/entities/article';
 
 export interface ArticleListPageProps {
   articles: Article[];
+  currentPage?: number;
+  totalPages?: number;
 }
 
-export function ArticleListPage({ articles }: ArticleListPageProps) {
+export function ArticleListPage({
+  articles,
+  currentPage = 1,
+  totalPages = 1,
+}: ArticleListPageProps) {
   return (
     <div className="py-10 sm:py-16">
       <Container>
@@ -22,11 +29,61 @@ export function ArticleListPage({ articles }: ArticleListPageProps) {
 
         {/* Grid Artikel */}
         {articles.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {articles.map((article) => (
-              <ArticleCard key={article.id} article={article} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {articles.map((article) => (
+                <ArticleCard key={article.id} article={article} />
+              ))}
+            </div>
+
+            {/* Pagination Controls (Requirement A.8) */}
+            {totalPages > 1 && (
+              <div className="mt-12 pt-8 border-t border-hairline-mist flex items-center justify-center gap-3">
+                {currentPage > 1 ? (
+                  <Link href={`/artikel?page=${currentPage - 1}`}>
+                    <Button variant="ghost-pill" size="sm">
+                      &larr; Halaman Sebelumnya
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button variant="ghost-pill" size="sm" disabled className="opacity-40">
+                    &larr; Halaman Sebelumnya
+                  </Button>
+                )}
+
+                <div className="flex items-center gap-1.5 px-3">
+                  {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((p) => {
+                    const isActive = p === currentPage;
+                    return (
+                      <Link key={p} href={`/artikel?page=${p}`}>
+                        <span
+                          className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
+                            isActive
+                              ? 'bg-ink-black text-pure-white shadow-xs'
+                              : 'bg-pure-white text-ink-black hover:bg-sandstone border border-hairline-mist'
+                          }`}
+                        >
+                          {p}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+
+                {currentPage < totalPages ? (
+                  <Link href={`/artikel?page=${currentPage + 1}`}>
+                    <Button variant="ghost-pill" size="sm">
+                      Halaman Selanjutnya &rarr;
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button variant="ghost-pill" size="sm" disabled className="opacity-40">
+                    Halaman Selanjutnya &rarr;
+                  </Button>
+                )}
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-20 bg-pure-white rounded-[50px] p-8 border border-hairline-mist max-w-xl mx-auto">
             <span className="text-4xl block mb-3">📝</span>

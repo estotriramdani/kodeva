@@ -2,6 +2,7 @@
 
 import React, { useActionState, useEffect } from 'react';
 import { Button, Input } from '@/shared/ui';
+import { getStoredUtmParams } from '@/shared/lib/utm';
 import { submitLeadAction, type SubmitLeadState } from '../api/submit-lead.action';
 
 export interface LeadFormProps {
@@ -46,6 +47,12 @@ export function LeadForm({
     );
   }
 
+  const [utm, setUtm] = React.useState<ReturnType<typeof getStoredUtmParams>>({});
+
+  useEffect(() => {
+    setUtm(getStoredUtmParams());
+  }, []);
+
   return (
     <form action={formAction} className={`space-y-4 ${className || ''}`}>
       <input type="hidden" name="source_cta" value={sourceCta} />
@@ -59,6 +66,11 @@ export function LeadForm({
         name="referrer"
         value={typeof document !== 'undefined' ? document.referrer : ''}
       />
+      <input type="hidden" name="utm_source" value={utm.utm_source || ''} />
+      <input type="hidden" name="utm_medium" value={utm.utm_medium || ''} />
+      <input type="hidden" name="utm_campaign" value={utm.utm_campaign || ''} />
+      <input type="hidden" name="utm_term" value={utm.utm_term || ''} />
+      <input type="hidden" name="utm_content" value={utm.utm_content || ''} />
 
       {state.message && !state.success && (
         <div className="p-3.5 rounded-[16px] bg-coral-pop/10 text-coral-pop text-[14px] border border-coral-pop/20 font-medium">

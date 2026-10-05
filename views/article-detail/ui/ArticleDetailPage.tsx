@@ -3,14 +3,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Container, Card, Badge } from '@/shared/ui';
 import { ArticleContent, type Article } from '@/entities/article';
+import { ProductCard, type Product } from '@/entities/product';
 import { formatDateID } from '@/shared/lib';
 import { LeadForm } from '@/features/submit-lead';
 
 export interface ArticleDetailPageProps {
   article: Article;
+  linkedProducts?: Product[];
 }
 
-export function ArticleDetailPage({ article }: ArticleDetailPageProps) {
+export function ArticleDetailPage({ article, linkedProducts = [] }: ArticleDetailPageProps) {
   return (
     <div className="py-8 sm:py-12">
       <Container>
@@ -65,9 +67,31 @@ export function ArticleDetailPage({ article }: ArticleDetailPageProps) {
           )}
 
           {/* Konten Artikel */}
-          <Card surface="white" className="p-8 sm:p-14 border border-hairline-mist mb-16">
+          <Card surface="white" className="p-8 sm:p-14 border border-hairline-mist mb-12">
             <ArticleContent contentHtml={article.content_html} />
           </Card>
+
+          {/* Produk Tertaut dari Marketplace (Requirement A.10) */}
+          {linkedProducts && linkedProducts.length > 0 && (
+            <div className="mb-14">
+              <div className="flex items-center gap-2.5 mb-6">
+                <span className="text-2xl">🛍️</span>
+                <div>
+                  <h3 className="text-[22px] sm:text-[26px] font-medium text-ink-black leading-tight">
+                    Produk Rekomendasi Terkait Artikel Ini
+                  </h3>
+                  <p className="text-[14px] text-stone-gray mt-0.5">
+                    Solusi software yang dibahas dalam artikel ini dengan kuota promo diskon aktif.
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {linkedProducts.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Bottom Lead Banner */}
           <Card surface="sandstone" className="p-8 sm:p-10 text-center border border-hairline-mist mb-12">

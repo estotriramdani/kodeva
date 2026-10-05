@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { SITE_CONFIG } from '@/shared/config';
+import { UtmTracker } from '@/shared/ui';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -26,8 +27,10 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-cream-paper text-ink-black font-sans selection:bg-fresh-grass selection:text-ink-black">
+        <UtmTracker />
         {children}
       </body>
     </html>
   );
 }
+

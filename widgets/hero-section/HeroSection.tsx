@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Container, Button, Modal } from '@/shared/ui';
 import { HeroHeadline, type LandingHero } from '@/entities/hero';
 import { LeadForm } from '@/features/submit-lead';
+import { trackLandingCta } from '@/shared/lib/analytics';
 
 export interface HeroSectionProps {
   heroData?: LandingHero | null;
@@ -32,11 +33,23 @@ export function HeroSection({ heroData }: HeroSectionProps) {
               <Button
                 variant="coral-pill"
                 size="lg"
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => {
+                  trackLandingCta(
+                    heroData?.cta_label || 'Dapatkan Penawaran Promo',
+                    'hero_section',
+                    'modal_quote'
+                  );
+                  setIsModalOpen(true);
+                }}
               >
                 {heroData?.cta_label || 'Dapatkan Penawaran Promo'}
               </Button>
-              <Link href={heroData?.cta_href || '/produk'}>
+              <Link
+                href={heroData?.cta_href || '/produk'}
+                onClick={() => {
+                  trackLandingCta('Jelajahi Produk', 'hero_section', heroData?.cta_href || '/produk');
+                }}
+              >
                 <Button variant="ghost-pill" size="lg" dotColor="grass">
                   Jelajahi Produk
                 </Button>
