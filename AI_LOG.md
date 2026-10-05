@@ -121,6 +121,30 @@ Dokumen ini disusun sebagai bentuk transparansi dan evaluasi kritis terhadap pen
 
 ---
 
+### Kasus 6: Mitigasi Concurrency Race Condition pada Pengurangan Kuota Promo via PostgreSQL RPC
+* **Deskripsi Kebutuhan & Tantangan:**
+  Ketika prospek mengisi form klaim promo (*lead capture*), sisa kuota promo produk harus berkurang secara otomatis. Jika dua pengguna menekan tombol klaim bersamaan saat kuota tersisa 1, update sederhana di tingkat aplikasi berisiko menyebabkan *over-selling* (kuota menjadi negatif atau -1) akibat *race condition*. Selain itu, kebijakan RLS (Row Level Security) tabel `products` hanya memberikan hak akses `SELECT` bagi pengguna publik (*anon*), sehingga client/server action biasa akan ditolak jika mencoba melakukan `UPDATE` langsung ke tabel `products`.
+* **Bagaimana Diperbaiki:**
+  1. Menulis stored procedure PostgreSQL atomik `claim_product_promo_quota(p_product_id UUID, p_qty INT)` dengan klausa `UPDATE public.products SET promo_quota_remaining = promo_quota_remaining - p_qty WHERE id = p_product_id AND promo_quota_remaining >= p_qty RETURNING ...`.
+  2. Menetapkan fungsi tersebut sebagai `SECURITY DEFINER` dan membatasi eksekusinya hanya untuk logika pengurangan kuota yang sah.
+  3. Mengintegrasikan pemanggilan RPC dari `submitLeadAction`, mengembalikan feedback sisa kuota, serta memicu revalidasi cache Next.js (`revalidatePath('/')`, `revalidatePath('/produk')`, dan `revalidatePath('/produk/[slug]')`).
+* **Verifikasi Hasil Akhir:**
+  Eksekusi RPC langsung pada database remote Supabase diverifikasi berhasil mengurangi kuota secara presisi dan menolak pengurangan saat kuota tersisa 0.
+
+---
+
+### Kasus 7: Custom Digital Receipt Modal & Penghapusan AI Slop (Modernisasi Lucide)
+* **Deskripsi Kebutuhan & Tantangan:**
+  1. Tombol cetak bukti bayar sebelumnya memanggil `window.print()` langsung dari peramban, yang mencetak seluruh halaman website secara berantakan (termasuk background abu-abu, navbar, dan header peramban).
+  2. Proliferasi emoji pada berbagai kartu, sidebar, dan tombol memberikan kesan prototipe murahan (*AI slop*).
+* **Bagaimana Diperbaiki:**
+  1. Mengganti cetak browser mentah dengan `CustomReceiptModal` berbasis estetika MindMarket paper canvas. Modal ini menyertakan rincian produk, nomor referensi unik, preview kode otentikasi lisensi, tombol salin ringkasan teks ke clipboard (format WhatsApp/Email), dan tombol cetak bersih dengan stylesheet `@media print` terisolasi (hanya mencetak canvas tanda terima, menyembunyikan elemen web lainnya).
+  2. Memasang paket `lucide-react` dan menggantikan seluruh emoji di sidebar admin, dashboard prospek, konfigurasi pesanan, header, katalog, hingga keranjang belanja dengan ikon vektor yang bersih, seragam, dan profesional.
+* **Verifikasi Hasil Akhir:**
+  Seluruh 21 file komponen terbebas dari emoji liar, lolos verifikasi linting, dan antarmuka checkout tampak sangat rapi dan representatif sebagai produk enterprise.
+
+---
+
 ## 4. Bagian Implementasi yang Banyak Dibantu AI & Pengujian Edge Cases
 
 * **Fitur:** *Multi-Tier Product Promo Quota Accumulation Engine* di `entities/cart/model/cart-store.ts`.

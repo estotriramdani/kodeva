@@ -459,6 +459,17 @@ export type Database = {
     Functions: {
       is_admin: { Args: never; Returns: boolean }
       is_editor: { Args: never; Returns: boolean }
+      claim_product_promo_quota: {
+        Args: {
+          p_product_id: string
+          p_qty?: number
+        }
+        Returns: {
+          success: boolean
+          remaining?: number
+          error?: string
+        }
+      }
     }
     Enums: {
       article_status: "draft" | "published"

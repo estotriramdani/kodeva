@@ -111,18 +111,20 @@ shared/                    # UI Kit MindMarket, Helper Lib, Supabase SSR Clients
   * **Katalog Produk:** Tambah/edit/hapus software SaaS, kuota promo, tier lisensi, dan upload gambar thumbnail produk ke Supabase Storage.
   * **Blog & Artikel:** Tulis/edit/hapus artikel, status draft/publish, **Rich Text Editor (Toolbar H2, H3, P, B, I, List, Link, Quote + Live Preview)**, upload cover blog ke Supabase Storage, dan **Penautan Produk Marketplace (*Linked Products*)**.
   * **Kategori & Taksonomi:** Pengelompokan produk dan artikel blog di `/admin/categories`.
-  * **Form Lead Capture:** Validasi & proteksi anti-spam berlapis (Client Debounce + IP Hash SHA-256 limit 5/jam + Database Trigger deduplikasi 24 jam di PostgreSQL), serta dashboard prospek marketing di `/admin/dashboard` dengan tombol langsung *"Chat WhatsApp"*.
+  * **Form Lead Capture & Atomic Promo Quota:** Validasi & proteksi anti-spam berlapis (Client Debounce + IP Hash SHA-256 limit 5/jam + Database Trigger deduplikasi 24 jam di PostgreSQL), serta dashboard prospek marketing di `/admin/dashboard` dengan tombol langsung *"Chat WhatsApp"*.
+  * **Pengurangan Kuota Promo Otomatis (Anti Race Condition):** Saat user mengklaim promo melalui modal *"Amankan Kuota Promo"*, sisa kuota promo produk otomatis berkurang secara atomik di PostgreSQL lewat stored procedure `claim_product_promo_quota` yang thread-safe dari *concurrency race condition*.
 * **Mini Marketplace (Frontend):**
   * Katalog lengkap dengan **6 produk software bisnis UMKM** (POS Kasir, Payroll HR, Gudang Inventory, WhatsApp CRM, Smart Invoice, Resto Kitchen).
-  * Filter kategori interaktif.
+  * **Filter Kategori Interaktif dengan Tombol Geser:** Tombol navigasi Chevron kiri & kanan yang mendeteksi batas scroll horizontal dinamis untuk mempermudah navigasi pada berbagai tipe mouse/laptop.
   * Detail produk interaktif: Pilihan paket (*Basic, Pro, Business*) yang **langsung mengubah harga satuan, kalkulasi unit, dan estimasi hemat**.
   * **Keranjang Belanja (Cart Drawer & Floating Cart Button):** Tambah lisensi, ubah kuantitas, hapus item, auto-calculate subtotal & diskon, persistensi `localStorage`.
   * **Validasi Kuota Promo Lintas Paket (Critical Rule #4):** Deteksi kelebihan total kuota produk lintas tier dan pemblokiran checkout secara otomatis.
-  * **Halaman Checkout:** Form data pembeli (Nama, Email, WhatsApp) dengan validasi format, ringkasan pesanan, input voucher diskon (`KODEVAHEMAT`), dan **Simulasi Pembayaran (Status Sukses & Status Gagal)**.
-* **Kebutuhan Marketing:**
+  * **Halaman Checkout & Tanda Terima Digital Kustom:** Form data pembeli (Nama, Email, WhatsApp) dengan validasi format, ringkasan pesanan, input voucher diskon (`KODEVAHEMAT`), **Simulasi Pembayaran (Status Sukses & Status Gagal)**, serta **Tanda Terima Pembayaran Digital Kustom (`CustomReceiptModal`)** yang menggantikan browser print mentah dengan rincian lisensi software resmi, tombol salin teks ke clipboard (format WhatsApp/Email), dan stylesheet cetak terisolasi (`@media print`).
+* **Kebutuhan Marketing & UI/UX:**
   * **GA4 `dataLayer` Tracking:** Event `view_item`, `add_to_cart`, `begin_checkout`, `purchase`, dan klik CTA landing page terkirim dengan payload lengkap, bebas duplikasi re-render, serta dilengkapi konsol log informatif.
   * **UTM Attribution Persistence:** Parameter UTM (`utm_source`, `utm_campaign`, dll.) dari TikTok/Instagram ditangkap otomatis pada sesi landing page, disimpan di browser, dan diteruskan ke form Lead serta payload Order Checkout.
   * **Blog Edukasi:** 4 artikel bisnis UMKM dengan URL slug SEO-friendly, kontrol **Pagination (`?page=1`)**, dan komponen **Produk Tertaut (*Linked Products*)**.
+  * **Modernisasi Iconography Bebas AI Slop:** Menghilangkan seluruh penggunaan emoji liar di dashboard admin, kartu metrik, sidebar, katalog, dan konfigurasi checkout, menggantikannya dengan icon set presisi dan profesional dari `lucide-react`.
 
 ### ⚠️ Apa yang Belum Selesai (Dibatasi Batasan Brief Frontend):
 * Integrasi nyata payment gateway backend (Midtrans / Xendit).
@@ -191,18 +193,21 @@ Berikut adalah cetak biru teknis arsitektur backend jika sistem mini marketplace
 * **Idempotensi Webhook:** Webhook handler mencatat `event_id`. Jika webhook untuk pesanan yang sama diterima berulang kali, sistem mengembalikan HTTP 200 tanpa mengeksekusi ulang worker pengiriman lisensi.
 * **Status Transaksi:** `PENDING` $\rightarrow$ `PAID` / `SETTLEMENT` (Sukses) atau `EXPIRED` / `CANCELLED` (Gagal).
 
-### D. Cara Menjaga Kuota Lisensi Promo Tetap Akurat
-Untuk mencegah *Race Condition* (*over-selling* di mana kuota tersisa 1 tetapi 2 user checkout bersamaan):
-* **Pessimistic Atomic Decrement pada Database:**
+### D. Cara Menjaga Kuota Lisensi Promo Tetap Akurat & Menghandle Race Condition
+Untuk mencegah *Race Condition* (*over-selling* di mana kuota tersisa 1 tetapi 2 user mengklaim promo atau checkout bersamaan):
+* **Pessimistic Atomic Decrement pada Database (Sudah Diimplementasikan via PostgreSQL RPC):**
+  Telah diimplementasikan dan dideploy pada fungsi database `public.claim_product_promo_quota(p_product_id UUID, p_qty INT)` (lihat file migrasi `supabase-migrations/20261005000005_atomic_promo_quota.sql`):
   ```sql
-  -- Dijalankan di dalam transaksi PostgreSQL
-  UPDATE products
-  SET promo_quota_remaining = promo_quota_remaining - $total_licenses
-  WHERE id = $product_id
-    AND promo_quota_remaining >= $total_licenses;
+  -- Dijalankan secara atomik di PostgreSQL
+  UPDATE public.products
+  SET promo_quota_remaining = promo_quota_remaining - p_qty,
+      updated_at = NOW()
+  WHERE id = p_product_id
+    AND promo_quota_remaining >= p_qty
+  RETURNING promo_quota_remaining;
   ```
-  Jika row yang ter-update adalah 0, transaksi otomatis dibatalkan (*Rollback*) dan backend mengembalikan respons `409 Conflict: Kuota promo telah habis`.
-* **Reservasi Kuota Sementara:** Kuota dikurangi saat order dibuat dengan masa kedaluwarsa 15 menit. Jika pembayaran tidak diselesaikan sebelum batas waktu, cron job otomatis mengembalikan kuota tersebut (`revert quota`).
+  Fungsi ini berjalan di bawah mode `SECURITY DEFINER` dengan hak akses eksekusi publik. Hal ini memastikan user yang mengisi form klaim promo (*lead capture*) dapat mengurangi kuota secara aman dan instan tanpa memerlukan izin UPDATE langsung ke tabel `products` (yang dibatasi RLS SELECT-only untuk publik). Jika kuota tersisa tidak mencukupi saat dua request tiba bersamaan, PostgreSQL mengunci row secara berurutan dan klaim kedua otomatis gagal (`success = false`), sehingga race condition tertangani 100% tanpa risiko kuota negatif (*over-selling*).
+* **Reservasi Kuota Sementara:** Pada backend pembayaran penuh, kuota direservasi saat order dibuat dengan masa kedaluwarsa 15 menit. Jika pembayaran tidak diselesaikan sebelum batas waktu, cron job otomatis mengembalikan kuota tersebut (`revert quota`).
 
 ### E. Pengiriman Lisensi Setelah Pembayaran Berhasil
 * Menerapkan **Transactional Outbox Pattern**:
