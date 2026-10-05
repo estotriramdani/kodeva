@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/entities/cart';
 import { formatIDR } from '@/shared/lib';
@@ -33,12 +33,12 @@ export function CheckoutPage() {
     paymentMethod: string;
   } | null>(null);
 
-  const [utmParams, setUtmParams] = useState<UtmParams>({});
+  const utmParams = React.useSyncExternalStore<UtmParams>(
+    () => () => {},
+    getStoredUtmParams,
+    () => ({})
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    setUtmParams(getStoredUtmParams());
-  }, []);
 
   // Voucher validation (Bonus feature)
   const handleApplyVoucher = () => {

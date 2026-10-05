@@ -16,6 +16,8 @@ const initialState: SubmitLeadState = {
   success: false,
 };
 
+const emptySubscribe = () => () => {};
+
 export function LeadForm({
   sourceCta = 'website_cta',
   onSuccess,
@@ -23,6 +25,11 @@ export function LeadForm({
   className,
 }: LeadFormProps) {
   const [state, formAction, isPending] = useActionState(submitLeadAction, initialState);
+  const utm = React.useSyncExternalStore<ReturnType<typeof getStoredUtmParams>>(
+    emptySubscribe,
+    getStoredUtmParams,
+    () => ({})
+  );
 
   useEffect(() => {
     if (state.success && onSuccess) {
@@ -46,12 +53,6 @@ export function LeadForm({
       </div>
     );
   }
-
-  const [utm, setUtm] = React.useState<ReturnType<typeof getStoredUtmParams>>({});
-
-  useEffect(() => {
-    setUtm(getStoredUtmParams());
-  }, []);
 
   return (
     <form action={formAction} className={`space-y-4 ${className || ''}`}>

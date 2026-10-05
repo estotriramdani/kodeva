@@ -1,22 +1,23 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useSyncExternalStore } from 'react';
 import { useCartStore } from './cart-store';
 
-export function useCart() {
-  const [mounted, setMounted] = useState(false);
-  const store = useCartStore();
+const emptySubscribe = () => () => {};
 
-  useEffect(() => {
-    setMounted(true);
-    store.setHasHydrated(true);
-  }, []);
+export function useCart() {
+  const isHydrated = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
+  const store = useCartStore();
 
   return {
     ...store,
-    isHydrated: mounted,
-    items: mounted ? store.items : [],
-    summary: mounted
+    isHydrated,
+    items: isHydrated ? store.items : [],
+    summary: isHydrated
       ? store.getSummary()
       : {
           totalItems: 0,
@@ -25,6 +26,6 @@ export function useCart() {
           discountTotal: 0,
           grandTotal: 0,
         },
-    validation: mounted ? store.validateQuotas() : { isValid: true, violations: [] },
+    validation: isHydrated ? store.validateQuotas() : { isValid: true, violations: [] },
   };
 }
