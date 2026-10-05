@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Check } from 'lucide-react';
 import { Container, Card, Badge } from '@/shared/ui';
 import type { Product } from '@/entities/product';
 import { PricingTable } from '@/widgets/pricing-table';
@@ -70,7 +71,7 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
                         key={idx}
                         className="flex items-center gap-2 text-[14px] text-ink-black bg-cream-paper/70 px-3 py-2 rounded-[12px]"
                       >
-                        <span className="text-fresh-grass font-bold">✓</span>
+                        <Check className="w-4 h-4 text-fresh-grass shrink-0" />
                         <span>{feat}</span>
                       </div>
                     ))}

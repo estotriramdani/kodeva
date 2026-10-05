@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useTransition } from 'react';
 import Image from 'next/image';
+import { UploadCloud, AlertCircle } from 'lucide-react';
 import { Button } from '@/shared/ui';
 import { uploadMediaAction } from '../api/upload.actions';
 
@@ -219,8 +220,8 @@ export function ImageUploader({
               }}
               className="border-2 border-dashed border-hairline-mist hover:border-fresh-grass bg-cream-paper/50 hover:bg-cream-paper rounded-[24px] p-6 text-center cursor-pointer transition-colors group"
             >
-              <div className="w-12 h-12 rounded-full bg-pure-white border border-hairline-mist mx-auto flex items-center justify-center text-xl group-hover:scale-110 transition-transform mb-2">
-                ☁️
+              <div className="w-12 h-12 rounded-full bg-pure-white border border-hairline-mist mx-auto flex items-center justify-center text-stone-gray group-hover:scale-110 transition-transform mb-2">
+                <UploadCloud className="w-6 h-6 group-hover:text-fresh-grass transition-colors" />
               </div>
               <p className="text-[14px] font-medium text-ink-black">
                 Klik atau Seret Gambar ke Sini
@@ -236,8 +237,9 @@ export function ImageUploader({
 
       {/* Error Message */}
       {errorMessage && (
-        <p className="text-[12px] text-coral-pop font-medium mt-1">
-          ⚠️ {errorMessage}
+        <p className="text-[12px] text-coral-pop font-medium mt-1 flex items-center gap-1.5">
+          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+          <span>{errorMessage}</span>
         </p>
       )}
     </div>

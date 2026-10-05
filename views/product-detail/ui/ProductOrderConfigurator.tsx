@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { AlertTriangle, ShoppingBag, Zap } from 'lucide-react';
 import type { Product, ProductPlan, PlanTier } from '@/entities/product';
 import { useCart } from '@/entities/cart';
 import { formatIDR } from '@/shared/lib';
@@ -222,10 +223,13 @@ export function ProductOrderConfigurator({ product }: ProductOrderConfiguratorPr
 
       {/* Quota Overflow Error Alert */}
       {(isQuotaExceeded || errorMessage) && (
-        <div className="mb-6 p-4 rounded-[20px] bg-coral-pop/10 border border-coral-pop/30 text-coral-pop text-[13px]">
-          <strong>⚠️ Peringatan Kuota Promo:</strong>{' '}
-          {errorMessage ||
-            `Kombinasi lisensi di keranjang (${existingCartQty}) + pesanan baru (${quantity}) = ${requestedCombinedTotal} lisensi, melebihi sisa kuota promo (${quotaLimit}).`}
+        <div className="mb-6 p-4 rounded-[20px] bg-coral-pop/10 border border-coral-pop/30 text-coral-pop text-[13px] flex items-start gap-2.5">
+          <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+          <div>
+            <strong>Peringatan Kuota Promo:</strong>{' '}
+            {errorMessage ||
+              `Kombinasi lisensi di keranjang (${existingCartQty}) + pesanan baru (${quantity}) = ${requestedCombinedTotal} lisensi, melebihi sisa kuota promo (${quotaLimit}).`}
+          </div>
         </div>
       )}
 
@@ -261,18 +265,20 @@ export function ProductOrderConfigurator({ product }: ProductOrderConfiguratorPr
           dotColor="grass"
           disabled={isQuotaExceeded}
           onClick={() => handleAddToCart(false)}
-          className="flex-1 justify-center py-3.5"
+          className="flex-1 justify-center py-3.5 inline-flex items-center gap-2"
         >
-          🛒 Tambah ke Keranjang
+          <ShoppingBag className="w-4 h-4" />
+          <span>Tambah ke Keranjang</span>
         </Button>
         <Button
           variant="coral-pill"
           size="lg"
           disabled={isQuotaExceeded}
           onClick={() => handleAddToCart(true)}
-          className="flex-1 justify-center py-3.5"
+          className="flex-1 justify-center py-3.5 inline-flex items-center gap-2"
         >
-          ⚡ Beli Sekarang
+          <Zap className="w-4 h-4" />
+          <span>Beli Sekarang</span>
         </Button>
       </div>
     </div>

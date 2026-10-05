@@ -2,6 +2,7 @@
 
 import React, { useState, useActionState } from 'react';
 import Image from 'next/image';
+import { Sparkles, MessageSquareQuote, HelpCircle } from 'lucide-react';
 import { Card, Badge, Button, Modal, Input, Textarea } from '@/shared/ui';
 import { ImageUploader } from '@/features/upload-media';
 import {
@@ -105,33 +106,36 @@ export function AdminLandingPage({
       <div className="flex border-b border-hairline-mist gap-2 sm:gap-4">
         <button
           onClick={() => setActiveTab('hero')}
-          className={`pb-3 px-4 text-[15px] font-semibold transition-all border-b-2 cursor-pointer ${
+          className={`pb-3 px-4 text-[15px] font-semibold transition-all border-b-2 cursor-pointer inline-flex items-center gap-2 ${
             activeTab === 'hero'
               ? 'border-ink-black text-ink-black'
               : 'border-transparent text-stone-gray hover:text-ink-black'
           }`}
         >
-          🌟 Section Hero Banner
+          <Sparkles className="w-4 h-4" />
+          <span>Hero Banner</span>
         </button>
         <button
           onClick={() => setActiveTab('testimonials')}
-          className={`pb-3 px-4 text-[15px] font-semibold transition-all border-b-2 cursor-pointer ${
+          className={`pb-3 px-4 text-[15px] font-semibold transition-all border-b-2 cursor-pointer inline-flex items-center gap-2 ${
             activeTab === 'testimonials'
               ? 'border-ink-black text-ink-black'
               : 'border-transparent text-stone-gray hover:text-ink-black'
           }`}
         >
-          💬 Testimoni ({testimonials.length})
+          <MessageSquareQuote className="w-4 h-4" />
+          <span>Testimoni ({testimonials.length})</span>
         </button>
         <button
           onClick={() => setActiveTab('faqs')}
-          className={`pb-3 px-4 text-[15px] font-semibold transition-all border-b-2 cursor-pointer ${
+          className={`pb-3 px-4 text-[15px] font-semibold transition-all border-b-2 cursor-pointer inline-flex items-center gap-2 ${
             activeTab === 'faqs'
               ? 'border-ink-black text-ink-black'
               : 'border-transparent text-stone-gray hover:text-ink-black'
           }`}
         >
-          ❓ Tanya Jawab FAQ ({faqs.length})
+          <HelpCircle className="w-4 h-4" />
+          <span>Tanya Jawab FAQ ({faqs.length})</span>
         </button>
       </div>
 

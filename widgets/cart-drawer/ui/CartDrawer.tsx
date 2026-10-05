@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { X, AlertTriangle, ShoppingBag, Trash2 } from 'lucide-react';
 import { useCart } from '@/entities/cart';
 import { formatIDR } from '@/shared/lib';
 import { Button, Badge } from '@/shared/ui';
@@ -61,9 +62,9 @@ export function CartDrawer() {
           <button
             onClick={() => setDrawerOpen(false)}
             aria-label="Tutup Keranjang"
-            className="w-9 h-9 rounded-full bg-sandstone/60 hover:bg-sandstone flex items-center justify-center text-ink-black transition-colors"
+            className="w-9 h-9 rounded-full bg-sandstone/60 hover:bg-sandstone flex items-center justify-center text-ink-black transition-colors cursor-pointer"
           >
-            ✕
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -71,7 +72,7 @@ export function CartDrawer() {
         {isHydrated && !validation.isValid && (
           <div className="m-4 p-4 rounded-[20px] bg-coral-pop/10 border border-coral-pop/30 text-ink-black">
             <div className="flex items-start gap-2.5">
-              <span className="text-coral-pop text-lg font-bold">⚠️</span>
+              <AlertTriangle className="w-5 h-5 text-coral-pop shrink-0 mt-0.5" />
               <div className="text-[13px]">
                 <strong className="text-coral-pop block mb-1">
                   Kelebihan Kuota Promo Terdeteksi!
@@ -90,8 +91,8 @@ export function CartDrawer() {
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {!isHydrated || items.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center py-12">
-              <div className="w-16 h-16 rounded-full bg-sandstone/60 flex items-center justify-center text-2xl mb-4">
-                🛒
+              <div className="w-16 h-16 rounded-full bg-sandstone/60 flex items-center justify-center mb-4 text-stone-gray">
+                <ShoppingBag className="w-8 h-8" />
               </div>
               <h3 className="text-[18px] font-medium text-ink-black">
                 Keranjang Belanja Kosong
@@ -123,9 +124,9 @@ export function CartDrawer() {
                   <button
                     onClick={() => removeItem(item.id)}
                     aria-label={`Hapus ${item.productName}`}
-                    className="text-stone-gray hover:text-coral-pop text-[14px] p-1 transition-colors"
+                    className="text-stone-gray hover:text-coral-pop p-1.5 rounded-full hover:bg-coral-pop/10 transition-colors cursor-pointer"
                   >
-                    🗑️
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
 

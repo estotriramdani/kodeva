@@ -3,6 +3,7 @@
 import React, { useState, useActionState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Package, FileText } from 'lucide-react';
 import { Card, Badge, Button, Modal, Input, Textarea } from '@/shared/ui';
 import {
   createArticleAction,
@@ -143,8 +144,9 @@ export function AdminArticlesPage({
                     </td>
                     <td className="py-3.5 pr-4">
                       {article.linked_product_ids && article.linked_product_ids.length > 0 ? (
-                        <Badge variant="coral">
-                          📦 {article.linked_product_ids.length} Produk
+                        <Badge variant="coral" className="inline-flex items-center gap-1">
+                          <Package className="w-3 h-3" />
+                          <span>{article.linked_product_ids.length} Produk</span>
                         </Badge>
                       ) : (
                         <span className="text-stone-gray text-[13px]">-</span>
@@ -196,7 +198,7 @@ export function AdminArticlesPage({
           </div>
         ) : (
           <div className="text-center py-16 text-stone-gray">
-            <span className="text-3xl block mb-2">📝</span>
+            <FileText className="w-10 h-10 text-stone-gray/60 mx-auto mb-2" />
             <p className="font-medium text-ink-black">Belum ada artikel yang ditulis.</p>
             <p className="text-[13px] text-stone-gray mt-1">
               Klik tombol &quot;+ Tulis Artikel Baru&quot; di atas untuk membuat postingan pertama.
@@ -319,11 +321,11 @@ export function AdminArticlesPage({
                         value={prod.id}
                         className="w-4 h-4 rounded text-fresh-grass focus:ring-fresh-grass"
                       />
-                      <div className="relative w-8 h-8 rounded-[8px] bg-sandstone overflow-hidden shrink-0">
+                      <div className="relative w-8 h-8 rounded-[8px] bg-sandstone overflow-hidden shrink-0 flex items-center justify-center">
                         {prod.thumbnail_url ? (
                           <Image src={prod.thumbnail_url} alt={prod.name} fill className="object-cover" />
                         ) : (
-                          <span className="text-[10px] font-bold text-stone-gray flex items-center justify-center h-full">📦</span>
+                          <Package className="w-4 h-4 text-stone-gray" />
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -495,11 +497,11 @@ export function AdminArticlesPage({
                         defaultChecked={editingArticle.linked_product_ids?.includes(prod.id)}
                         className="w-4 h-4 rounded text-fresh-grass focus:ring-fresh-grass"
                       />
-                      <div className="relative w-8 h-8 rounded-[8px] bg-sandstone overflow-hidden shrink-0">
+                      <div className="relative w-8 h-8 rounded-[8px] bg-sandstone overflow-hidden shrink-0 flex items-center justify-center">
                         {prod.thumbnail_url ? (
                           <Image src={prod.thumbnail_url} alt={prod.name} fill className="object-cover" />
                         ) : (
-                          <span className="text-[10px] font-bold text-stone-gray flex items-center justify-center h-full">📦</span>
+                          <Package className="w-4 h-4 text-stone-gray" />
                         )}
                       </div>
                       <div className="min-w-0 flex-1">

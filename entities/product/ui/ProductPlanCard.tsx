@@ -1,4 +1,5 @@
 import React from 'react';
+import { Check } from 'lucide-react';
 import { Card, Badge } from '@/shared/ui';
 import { formatIDR } from '@/shared/lib';
 import type { ProductPlan } from '../model/types';
@@ -81,7 +82,7 @@ export function ProductPlanCard({
             <ul className="space-y-2 text-[14px] text-ink-black">
               {plan.features.map((feature, idx) => (
                 <li key={idx} className="flex items-start gap-2">
-                  <span className="text-fresh-grass font-bold">✓</span>
+                  <Check className="w-4 h-4 text-fresh-grass shrink-0 mt-0.5" />
                   <span>{feature}</span>
                 </li>
               ))}

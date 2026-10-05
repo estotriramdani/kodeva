@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
+import { Code, Eye, Link2, Quote } from 'lucide-react';
 
 export interface RichTextEditorProps {
   name: string;
@@ -64,24 +65,26 @@ export function RichTextEditor({
           <button
             type="button"
             onClick={() => setMode('edit')}
-            className={`px-3 py-1 rounded-full transition-colors cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full transition-colors cursor-pointer ${
               mode === 'edit'
                 ? 'bg-pure-white text-ink-black shadow-xs font-semibold'
                 : 'text-stone-gray hover:text-ink-black'
             }`}
           >
-            ✏️ Editor HTML
+            <Code className="w-3.5 h-3.5" />
+            <span>Editor HTML</span>
           </button>
           <button
             type="button"
             onClick={() => setMode('preview')}
-            className={`px-3 py-1 rounded-full transition-colors cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full transition-colors cursor-pointer ${
               mode === 'preview'
                 ? 'bg-pure-white text-ink-black shadow-xs font-semibold'
                 : 'text-stone-gray hover:text-ink-black'
             }`}
           >
-            👁️ Pratinjau Tampilan
+            <Eye className="w-3.5 h-3.5" />
+            <span>Pratinjau</span>
           </button>
         </div>
       </div>
@@ -158,19 +161,21 @@ export function RichTextEditor({
               onClick={() =>
                 insertTag('<a href="https://" target="_blank" rel="noopener noreferrer">', '</a>', 'Nama Tautan')
               }
-              className="px-2 py-1 rounded-[8px] bg-pure-white hover:bg-sandstone text-ink-black border border-hairline-mist/50 cursor-pointer"
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-[8px] bg-pure-white hover:bg-sandstone text-ink-black border border-hairline-mist/50 cursor-pointer"
               title="Tautan / Link"
             >
-              🔗 Link
+              <Link2 className="w-3 h-3" />
+              <span>Link</span>
             </button>
             <button
               type="button"
               disabled={disabled}
               onClick={() => insertTag('<blockquote>', '</blockquote>', 'Kutipan inspiratif atau kutipan penting...')}
-              className="px-2 py-1 rounded-[8px] bg-pure-white hover:bg-sandstone text-ink-black border border-hairline-mist/50 cursor-pointer"
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-[8px] bg-pure-white hover:bg-sandstone text-ink-black border border-hairline-mist/50 cursor-pointer"
               title="Blockquote"
             >
-              ❝ Quote
+              <Quote className="w-3 h-3" />
+              <span>Quote</span>
             </button>
           </div>
 

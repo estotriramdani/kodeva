@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import { X } from 'lucide-react';
 import { cn } from '@/shared/lib';
 
 export interface ModalProps {
@@ -69,9 +70,9 @@ export function Modal({
           onClick={onClose}
           type="button"
           aria-label="Tutup"
-          className="absolute top-6 right-6 w-9 h-9 rounded-full bg-cream-paper text-ink-black hover:bg-sandstone flex items-center justify-center text-lg font-medium transition-colors"
+          className="absolute top-6 right-6 w-9 h-9 rounded-full bg-cream-paper text-ink-black hover:bg-sandstone flex items-center justify-center transition-colors cursor-pointer"
         >
-          ✕
+          <X className="w-4 h-4" />
         </button>
 
         {title && (

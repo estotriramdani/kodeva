@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ShoppingBag } from 'lucide-react';
 import { Container, Card, Badge } from '@/shared/ui';
 import { ArticleContent, type Article } from '@/entities/article';
 import { ProductCard, type Product } from '@/entities/product';
@@ -74,8 +75,10 @@ export function ArticleDetailPage({ article, linkedProducts = [] }: ArticleDetai
           {/* Produk Tertaut dari Marketplace (Requirement A.10) */}
           {linkedProducts && linkedProducts.length > 0 && (
             <div className="mb-14">
-              <div className="flex items-center gap-2.5 mb-6">
-                <span className="text-2xl">🛍️</span>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-full bg-sandstone/60 flex items-center justify-center shrink-0 text-ink-black">
+                  <ShoppingBag className="w-5 h-5" />
+                </div>
                 <div>
                   <h3 className="text-[22px] sm:text-[26px] font-medium text-ink-black leading-tight">
                     Produk Rekomendasi Terkait Artikel Ini

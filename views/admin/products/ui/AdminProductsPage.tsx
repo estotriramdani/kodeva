@@ -3,6 +3,7 @@
 import React, { useState, useActionState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Package } from 'lucide-react';
 import { Card, Badge, Button, Modal, Input, Textarea } from '@/shared/ui';
 import {
   createProductAction,
@@ -187,7 +188,7 @@ export function AdminProductsPage({
           </div>
         ) : (
           <div className="text-center py-16 text-stone-gray">
-            <span className="text-3xl block mb-2">📦</span>
+            <Package className="w-10 h-10 text-stone-gray/60 mx-auto mb-2" />
             <p className="font-medium text-ink-black">Belum ada produk yang didaftarkan.</p>
             <p className="text-[13px] text-stone-gray mt-1">
               Klik tombol &quot;+ Tambah Produk Baru&quot; di atas untuk memasukkan data pertama.

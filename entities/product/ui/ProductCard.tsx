@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Check } from 'lucide-react';
 import { Card, Badge, Button } from '@/shared/ui';
 import { formatIDR } from '@/shared/lib';
 import type { Product } from '../model/types';
@@ -66,9 +67,10 @@ export function ProductCard({ product, actionSlot }: ProductCardProps) {
             {product.features.slice(0, 3).map((feature, idx) => (
               <span
                 key={idx}
-                className="text-[12px] bg-sandstone/60 text-ink-black px-2.5 py-1 rounded-[8px]"
+                className="inline-flex items-center text-[12px] bg-sandstone/60 text-ink-black px-2.5 py-1 rounded-[8px]"
               >
-                ✓ {feature}
+                <Check className="w-3 h-3 text-fresh-grass mr-1 shrink-0" />
+                <span>{feature}</span>
               </span>
             ))}
           </div>

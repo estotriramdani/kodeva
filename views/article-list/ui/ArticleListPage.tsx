@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { FileText } from 'lucide-react';
 import { Container, Button } from '@/shared/ui';
 import { ArticleCard, type Article } from '@/entities/article';
 
@@ -86,7 +87,7 @@ export function ArticleListPage({
           </>
         ) : (
           <div className="text-center py-20 bg-pure-white rounded-[50px] p-8 border border-hairline-mist max-w-xl mx-auto">
-            <span className="text-4xl block mb-3">📝</span>
+            <FileText className="w-12 h-12 text-stone-gray/60 mx-auto mb-3" />
             <h3 className="text-[22px] font-medium text-ink-black mb-2">
               Belum Ada Artikel yang Dipublikasikan
             </h3>

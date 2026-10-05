@@ -2,6 +2,7 @@
 
 import React, { useState, useTransition } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { Search } from 'lucide-react';
 import { Input } from '@/shared/ui';
 
 export interface ProductSearchBarProps {
@@ -44,9 +45,9 @@ export function ProductSearchBar({
         <button
           type="submit"
           aria-label="Cari"
-          className="absolute right-3.5 text-stone-gray hover:text-ink-black transition-colors"
+          className="absolute right-3.5 text-stone-gray hover:text-ink-black transition-colors flex items-center justify-center cursor-pointer"
         >
-          🔍
+          <Search className="w-4 h-4" />
         </button>
       </div>
     </form>

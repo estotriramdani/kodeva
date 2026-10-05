@@ -3,6 +3,17 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import {
+  LayoutDashboard,
+  Palette,
+  Package,
+  FileText,
+  Tag,
+  ExternalLink,
+  Menu,
+  X,
+  LogOut,
+} from 'lucide-react';
 import { cn } from '@/shared/lib';
 import { logoutAction } from '@/features/auth';
 
@@ -22,28 +33,28 @@ export function AdminSidebar({
     {
       href: '/admin/dashboard',
       label: 'Prospek & Leads',
-      icon: '📊',
+      icon: LayoutDashboard,
       badge: 'Utama',
     },
     {
       href: '/admin/landing',
       label: 'Konten Landing',
-      icon: '🎨',
+      icon: Palette,
     },
     {
       href: '/admin/products',
       label: 'Katalog Produk',
-      icon: '📦',
+      icon: Package,
     },
     {
       href: '/admin/articles',
       label: 'Artikel & Blog',
-      icon: '📝',
+      icon: FileText,
     },
     {
       href: '/admin/categories',
       label: 'Kategori',
-      icon: '🏷️',
+      icon: Tag,
     },
   ];
 
@@ -62,10 +73,10 @@ export function AdminSidebar({
 
         <button
           onClick={() => setIsMobileOpen(!isMobileOpen)}
-          className="w-9 h-9 rounded-full bg-cream-paper text-ink-black flex items-center justify-center text-lg"
+          className="w-9 h-9 rounded-full bg-cream-paper text-ink-black flex items-center justify-center transition-colors"
           aria-label="Toggle menu"
         >
-          {isMobileOpen ? '✕' : '☰'}
+          {isMobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
@@ -107,9 +118,10 @@ export function AdminSidebar({
 
             <button
               onClick={() => setIsMobileOpen(false)}
-              className="lg:hidden text-stone-gray hover:text-ink-black text-lg"
+              className="lg:hidden text-stone-gray hover:text-ink-black transition-colors"
+              aria-label="Close menu"
             >
-              ✕
+              <X className="w-5 h-5" />
             </button>
           </div>
 
@@ -124,6 +136,8 @@ export function AdminSidebar({
                   ? pathname === '/admin/dashboard'
                   : pathname.startsWith(item.href);
 
+              const IconComponent = item.icon;
+
               return (
                 <Link
                   key={item.href}
@@ -137,7 +151,7 @@ export function AdminSidebar({
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-lg">{item.icon}</span>
+                    <IconComponent className="w-4 h-4 shrink-0" />
                     <span>{item.label}</span>
                   </div>
 
@@ -167,7 +181,10 @@ export function AdminSidebar({
             target="_blank"
             className="flex items-center justify-between px-3.5 py-2 rounded-[16px] text-[13px] text-ink-black/80 bg-cream-paper/70 hover:bg-cream-paper transition-colors font-medium"
           >
-            <span>↗ Buka Website Publik</span>
+            <span className="inline-flex items-center gap-1.5">
+              <ExternalLink className="w-3.5 h-3.5 text-stone-gray" />
+              <span>Buka Website Publik</span>
+            </span>
             <span className="text-[11px] text-stone-gray">Tab Baru</span>
           </Link>
 
@@ -190,9 +207,10 @@ export function AdminSidebar({
             <form action={logoutAction}>
               <button
                 type="submit"
-                className="w-full text-center py-1.5 px-3 rounded-[12px] bg-pure-white text-[13px] font-medium text-coral-pop hover:bg-coral-pop/10 border border-hairline-mist transition-colors cursor-pointer"
+                className="w-full inline-flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-[12px] bg-pure-white text-[13px] font-medium text-coral-pop hover:bg-coral-pop/10 border border-hairline-mist transition-colors cursor-pointer"
               >
-                Keluar (Logout)
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Keluar (Logout)</span>
               </button>
             </form>
           </div>

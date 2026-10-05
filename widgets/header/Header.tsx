@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ShoppingBag, Menu, X } from 'lucide-react';
 import { Button, Container, Modal } from '@/shared/ui';
 import { LeadForm } from '@/features/submit-lead';
 import { SITE_CONFIG } from '@/shared/config';
@@ -71,7 +72,7 @@ export function Header() {
               className="relative p-2.5 rounded-full hover:bg-cream-paper transition-colors flex items-center justify-center text-ink-black cursor-pointer"
               aria-label={`Buka Keranjang: ${isHydrated ? summary.totalItems : 0} lisensi`}
             >
-              <span className="text-lg">🛒</span>
+              <ShoppingBag className="w-5 h-5" />
               {isHydrated && summary.totalItems > 0 && (
                 <span className="absolute 0 top-0.5 right-0.5 bg-coral-pop text-pure-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-1 border-pure-white">
                   {summary.totalItems}
@@ -94,10 +95,10 @@ export function Header() {
             <Button
               variant="circle-icon"
               aria-label="Menu"
-              className="md:hidden"
+              className="md:hidden flex items-center justify-center"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              {isMobileMenuOpen ? '✕' : '☰'}
+              {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </Button>
           </div>
         </nav>

@@ -1,6 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
+import {
+  BarChart3,
+  Package,
+  FileText,
+  Tag,
+  MessageSquare,
+  Inbox,
+} from 'lucide-react';
 import { Card, Badge } from '@/shared/ui';
 import { formatDateID } from '@/shared/lib';
 import type { Lead } from '@/entities/lead';
@@ -51,7 +59,7 @@ export function AdminDashboardPage({
           </span>
           <div className="flex items-baseline justify-between mt-2">
             <span className="text-[34px] font-bold text-ink-black">{leads.length}</span>
-            <span className="text-xl">📊</span>
+            <BarChart3 className="w-6 h-6 text-fresh-grass" />
           </div>
           <p className="text-[12px] text-fresh-grass font-medium mt-1">
             Data kontak tervalidasi
@@ -64,7 +72,7 @@ export function AdminDashboardPage({
           </span>
           <div className="flex items-baseline justify-between mt-2">
             <span className="text-[34px] font-bold text-ink-black">{productsCount}</span>
-            <span className="text-xl">📦</span>
+            <Package className="w-6 h-6 text-stone-gray" />
           </div>
           <p className="text-[12px] text-stone-gray mt-1">Tersedia di katalog</p>
         </Card>
@@ -75,7 +83,7 @@ export function AdminDashboardPage({
           </span>
           <div className="flex items-baseline justify-between mt-2">
             <span className="text-[34px] font-bold text-ink-black">{articlesCount}</span>
-            <span className="text-xl">📝</span>
+            <FileText className="w-6 h-6 text-stone-gray" />
           </div>
           <p className="text-[12px] text-stone-gray mt-1">Konten edukasi & SEO</p>
         </Card>
@@ -86,7 +94,7 @@ export function AdminDashboardPage({
           </span>
           <div className="flex items-baseline justify-between mt-2">
             <span className="text-[34px] font-bold text-coral-pop">{promoQuotaTotal}</span>
-            <span className="text-xl">🎁</span>
+            <Tag className="w-6 h-6 text-coral-pop" />
           </div>
           <p className="text-[12px] text-stone-gray mt-1">Tersedia untuk klaim</p>
         </Card>
@@ -146,7 +154,8 @@ export function AdminDashboardPage({
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-fresh-grass/20 hover:bg-fresh-grass/30 text-ink-black font-semibold text-[13px] transition-colors"
                         >
-                          <span>💬 Chat WA</span>
+                          <MessageSquare className="w-3.5 h-3.5 text-ink-black" />
+                          <span>Chat WA</span>
                           <span className="text-[11px] text-stone-gray">({lead.whatsapp})</span>
                         </a>
                       ) : (
@@ -171,7 +180,7 @@ export function AdminDashboardPage({
           </div>
         ) : (
           <div className="text-center py-16 text-stone-gray">
-            <span className="text-3xl block mb-2">📥</span>
+            <Inbox className="w-10 h-10 text-stone-gray/60 mx-auto mb-2" />
             <p className="font-medium text-ink-black">Belum ada prospek yang sesuai.</p>
             <p className="text-[13px] text-stone-gray mt-1">
               Data akan otomatis masuk saat calon pembeli mengisi formulir di landing page.

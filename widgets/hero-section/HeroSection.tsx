@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { CheckCircle2 } from 'lucide-react';
 import { Container, Button, Modal } from '@/shared/ui';
 import { HeroHeadline, type LandingHero } from '@/entities/hero';
 import { LeadForm } from '@/features/submit-lead';
@@ -68,8 +69,8 @@ export function HeroSection({ heroData }: HeroSectionProps) {
 
           {/* Central Editorial Badge */}
           <div className="relative z-10 bg-pure-white rounded-[40px] px-6 sm:px-10 py-5 sm:py-6 text-center border border-hairline-mist max-w-md">
-            <span className="text-[13px] font-semibold text-fresh-grass uppercase tracking-wider block mb-1">
-              ✓ 100% Lisensi Resmi & Terpercaya
+            <span className="text-[13px] font-semibold text-fresh-grass uppercase tracking-wider inline-flex items-center gap-1.5 mb-1">
+              <CheckCircle2 className="w-4 h-4" /> 100% Lisensi Resmi & Terpercaya
             </span>
             <p className="text-[16px] sm:text-[18px] font-medium text-ink-black leading-snug">
               Bandingkan fitur ERP, POS, CRM, & HRIS langsung dengan konsultan ahli.
