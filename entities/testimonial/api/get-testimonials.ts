@@ -1,4 +1,4 @@
-import { createServerClient } from '@/shared/api/supabase';
+import { createServerClient } from '@/shared/api/supabase/server';
 import type { Testimonial } from '../model/types';
 import { DEFAULT_MARKET_CODE } from '@/shared/config';
 

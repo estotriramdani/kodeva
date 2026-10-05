@@ -2,7 +2,7 @@
 
 import crypto from 'node:crypto';
 import { headers } from 'next/headers';
-import { createServerClient } from '@/shared/api/supabase';
+import { createServerClient } from '@/shared/api/supabase/server';
 import { validateLeadInput, type CreateLeadInput } from '@/entities/lead';
 
 export interface SubmitLeadState {

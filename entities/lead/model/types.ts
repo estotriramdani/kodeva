@@ -2,7 +2,7 @@ import type { Database } from '@/shared/api/supabase';
 
 export type LeadRow = Database['public']['Tables']['leads']['Row'];
 
-export interface Lead extends LeadRow {}
+export type Lead = LeadRow;
 
 export interface CreateLeadInput {
   name: string;

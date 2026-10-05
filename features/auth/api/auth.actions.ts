@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { createServerClient } from '@/shared/api/supabase';
+import { createServerClient } from '@/shared/api/supabase/server';
 
 export interface AuthState {
   error?: string;
