@@ -29,6 +29,7 @@ export function ProductOrderConfigurator({ product }: ProductOrderConfiguratorPr
   const [selectedTier, setSelectedTier] = useState<PlanTier>(
     (defaultPlan?.tier as PlanTier) || 'pro'
   );
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const [quantity, setQuantity] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -37,12 +38,15 @@ export function ProductOrderConfigurator({ product }: ProductOrderConfiguratorPr
 
   if (!selectedPlan) return null;
 
-  const currentPrice = selectedPlan.promo_price || selectedPlan.price;
-  const isPromo = selectedPlan.promo_price && selectedPlan.promo_price < selectedPlan.price;
+  const baseMonthlyPrice = selectedPlan.promo_price || selectedPlan.price;
+  const effectiveMonthlyPrice = billingCycle === 'yearly' ? Math.round(baseMonthlyPrice * 0.8) : baseMonthlyPrice;
+  const currentPrice = billingCycle === 'yearly' ? effectiveMonthlyPrice * 12 : effectiveMonthlyPrice;
+  const regularPeriodPrice = billingCycle === 'yearly' ? selectedPlan.price * 12 : selectedPlan.price;
+  const originalTotalPrice = regularPeriodPrice * quantity;
   const totalPrice = currentPrice * quantity;
-  const originalTotalPrice = selectedPlan.price * quantity;
-  const totalSavings = isPromo ? originalTotalPrice - totalPrice : 0;
-  const planDisplayName = tierLabels[selectedPlan.tier] || selectedPlan.tier;
+  const totalSavings = originalTotalPrice > totalPrice ? originalTotalPrice - totalPrice : 0;
+  const cycleLabel = billingCycle === 'yearly' ? 'Tahunan' : 'Bulanan';
+  const planDisplayName = `${tierLabels[selectedPlan.tier] || selectedPlan.tier} (${cycleLabel})`;
 
   // Cek akumulasi kuantitas produk lintas tier yang sudah ada di keranjang
   const existingCartQty = getProductTotalQuantity(product.id);
@@ -58,12 +62,12 @@ export function ProductOrderConfigurator({ product }: ProductOrderConfiguratorPr
       productSlug: product.slug,
       productName: product.name,
       productThumbnail: product.thumbnail_url,
-      planId: selectedPlan.id,
+      planId: `${selectedPlan.id}_${billingCycle}`,
       planTier: selectedPlan.tier,
       planName: planDisplayName,
-      unitName: selectedPlan.unit || 'unit',
-      price: selectedPlan.price,
-      promoPrice: selectedPlan.promo_price,
+      unitName: `${selectedPlan.unit}/${cycleLabel.toLowerCase()}`,
+      price: regularPeriodPrice,
+      promoPrice: currentPrice,
       quantity,
       promoQuotaRemaining: quotaLimit,
     });
@@ -118,15 +122,50 @@ export function ProductOrderConfigurator({ product }: ProductOrderConfiguratorPr
         )}
       </div>
 
-      {/* 1. Selector Pilihan Paket (Basic, Pro, Business) */}
+      {/* Durasi Langganan: Bulanan vs Tahunan (Bonus Requirement) */}
+      <div className="mb-6">
+        <label className="text-[13px] font-semibold text-stone-gray block mb-2.5">
+          1. PILIH DURASI TAGIHAN:
+        </label>
+        <div className="flex items-center p-1.5 bg-cream-paper rounded-full border border-hairline-mist max-w-sm">
+          <button
+            type="button"
+            onClick={() => setBillingCycle('monthly')}
+            className={`flex-1 py-2 px-4 rounded-full text-[13px] font-semibold transition-all cursor-pointer ${
+              billingCycle === 'monthly'
+                ? 'bg-ink-black text-pure-white shadow-xs'
+                : 'text-stone-gray hover:text-ink-black'
+            }`}
+          >
+            Tagihan Bulanan
+          </button>
+          <button
+            type="button"
+            onClick={() => setBillingCycle('yearly')}
+            className={`flex-1 py-2 px-4 rounded-full text-[13px] font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              billingCycle === 'yearly'
+                ? 'bg-ink-black text-pure-white shadow-xs'
+                : 'text-stone-gray hover:text-ink-black'
+            }`}
+          >
+            <span>Tahunan</span>
+            <span className="text-[10px] bg-sunshine-yellow text-ink-black px-1.5 py-0.5 rounded-full font-bold">
+              Hemat 20%
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* 2. Selector Pilihan Paket (Basic, Pro, Business) */}
       <div className="mb-6">
         <label className="text-[13px] font-semibold text-stone-gray block mb-3">
-          1. PILIH TINGKATAN PAKET:
+          2. PILIH TINGKATAN PAKET:
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {plans.map((plan) => {
             const isSelected = plan.tier === selectedTier;
-            const planEffectivePrice = plan.promo_price || plan.price;
+            const planBaseMonthly = plan.promo_price || plan.price;
+            const planEffectiveMonthly = billingCycle === 'yearly' ? Math.round(planBaseMonthly * 0.8) : planBaseMonthly;
             const displayName = tierLabels[plan.tier] || plan.tier;
 
             return (
@@ -155,29 +194,38 @@ export function ProductOrderConfigurator({ product }: ProductOrderConfiguratorPr
                     )}
                   </div>
                   <div className="text-[18px] font-bold text-ink-black mt-1">
-                    {formatIDR(planEffectivePrice)}
+                    {formatIDR(planEffectiveMonthly)}
                   </div>
                   <span className="text-[11px] text-stone-gray block">
                     /{plan.unit}/bulan
                   </span>
+                  {billingCycle === 'yearly' && (
+                    <span className="text-[10px] text-stone-gray/80 block mt-0.5">
+                      ditagih {formatIDR(planEffectiveMonthly * 12)}/tahun
+                    </span>
+                  )}
                 </div>
 
-                {plan.promo_price && plan.promo_price < plan.price && (
+                {billingCycle === 'yearly' ? (
+                  <div className="mt-2 text-[11px] text-fresh-grass font-semibold">
+                    Hemat 20% (Setara 2 Bln Gratis)
+                  </div>
+                ) : plan.promo_price && plan.promo_price < plan.price ? (
                   <div className="mt-2 text-[11px] text-fresh-grass font-semibold">
                     Hemat {formatIDR(plan.price - plan.promo_price)}
                   </div>
-                )}
+                ) : null}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* 2. Jumlah Unit / Outlet / User Stepper */}
+      {/* 3. Jumlah Unit / Outlet / User Stepper */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
           <label className="text-[13px] font-semibold text-stone-gray block">
-            2. JUMLAH LISENSI / {selectedPlan.unit.toUpperCase()}:
+            3. JUMLAH LISENSI / {selectedPlan.unit.toUpperCase()}:
           </label>
           {existingCartQty > 0 && (
             <span className="text-[12px] text-stone-gray">
@@ -233,7 +281,7 @@ export function ProductOrderConfigurator({ product }: ProductOrderConfiguratorPr
         </div>
       )}
 
-      {/* 3. Ringkasan Kalkulasi Harga Seketika */}
+      {/* 4. Ringkasan Kalkulasi Harga Seketika */}
       <div className="bg-sandstone/30 rounded-[24px] p-5 mb-6 border border-hairline-mist/60 space-y-2">
         <div className="flex justify-between text-[14px] text-stone-gray">
           <span>Paket Terpilih:</span>
@@ -257,7 +305,7 @@ export function ProductOrderConfigurator({ product }: ProductOrderConfiguratorPr
         </div>
       </div>
 
-      {/* 4. Tombol Aksi Keranjang & Checkout Langsung */}
+      {/* 5. Tombol Aksi Keranjang & Checkout Langsung */}
       <div className="flex flex-col sm:flex-row gap-3">
         <Button
           variant="ghost-pill"
