@@ -28,7 +28,7 @@ Brand: **Kodeva** (Platform Software Bisnis & Lisensi SaaS UMKM)
 
 1. **Clone repositori:**
    ```bash
-   git clone <URL_REPOSITORY>
+   git clone https://github.com/estotriramdani/kodeva.git
    cd kodeva
    ```
 
@@ -61,6 +61,13 @@ Brand: **Kodeva** (Platform Software Bisnis & Lisensi SaaS UMKM)
 * Email Demo: `admin@kodeva.test`
 * Sandi Demo: `KodevaAdmin2026!`
 *(Catatan: Pengunjung dapat menguji penambahan produk, artikel blog, dan kategori langsung di panel `/admin`)*.
+
+### Deployment Build
+
+* Landing Page: [https://kodeva-tau.vercel.app](https://kodeva-tau.vercel.app)
+* Admin Panel CMS: [https://kodeva.vercel.app/admin/login](https://kodeva-tau.vercel.app/admin/login)
+* Email Demo: `admin@kodeva.test`
+* Sandi Demo: `KodevaAdmin2026!`
 
 ---
 
