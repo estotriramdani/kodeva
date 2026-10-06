@@ -1,18 +1,11 @@
 'use client';
 
-import React, { useState, useActionState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Package, FileText } from 'lucide-react';
-import { Card, Badge, Button, Modal, Input, Textarea } from '@/shared/ui';
-import {
-  createArticleAction,
-  updateArticleAction,
-  deleteArticleAction,
-  RichTextEditor,
-  type ActionState,
-} from '@/features/manage-articles';
-import { ImageUploader } from '@/features/upload-media';
+import { Package, FileText, Plus, ExternalLink, Trash2, Edit3 } from 'lucide-react';
+import { Card, Badge } from '@/shared/ui';
+import { deleteArticleAction } from '@/features/manage-articles';
 import { formatDateID } from '@/shared/lib';
 import type { Article } from '@/entities/article';
 import type { Category } from '@/entities/category';
@@ -24,43 +17,9 @@ export interface AdminArticlesPageProps {
   products?: Product[];
 }
 
-const initialActionState: ActionState = {};
-
 export function AdminArticlesPage({
   articles,
-  categories,
-  products = [],
 }: AdminArticlesPageProps) {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [editingArticle, setEditingArticle] = useState<Article | null>(null);
-
-  const [createState, createAction, isCreating] = useActionState(
-    createArticleAction,
-    initialActionState
-  );
-  const [updateState, updateAction, isUpdating] = useActionState(
-    updateArticleAction,
-    initialActionState
-  );
-
-  React.useEffect(() => {
-    if (createState.success) {
-      const timer = setTimeout(() => {
-        setIsAddModalOpen(false);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [createState.success]);
-
-  React.useEffect(() => {
-    if (updateState.success) {
-      const timer = setTimeout(() => {
-        setEditingArticle(null);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [updateState.success]);
-
   return (
     <div className="space-y-8">
       {/* Header & Quick Action */}
@@ -70,17 +29,17 @@ export function AdminArticlesPage({
             Artikel & Edukasi Blog
           </h1>
           <p className="text-[15px] text-stone-gray mt-1">
-            Tulis ulasan software, tautkan produk marketplace, dan upload cover Supabase Storage.
+            Tulis ulasan software, panduan, tautkan produk marketplace, dan publikasikan artikel blog.
           </p>
         </div>
 
-        <Button
-          variant="grass-pill"
-          size="md"
-          onClick={() => setIsAddModalOpen(true)}
+        <Link
+          href="/admin/articles/new"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-fresh-grass text-ink-black font-semibold text-[15px] hover:opacity-90 transition-all shadow-sm shrink-0"
         >
-          + Tulis Artikel Baru
-        </Button>
+          <Plus className="w-4 h-4" />
+          <span>Tulis Artikel Baru</span>
+        </Link>
       </div>
 
       {/* Articles Table Card */}
@@ -165,20 +124,21 @@ export function AdminArticlesPage({
                     <td className="py-3.5 pr-4 text-stone-gray whitespace-nowrap">
                       {formatDateID(article.published_at || article.created_at)}
                     </td>
-                    <td className="py-3.5 text-right space-x-2">
-                      <button
-                        type="button"
-                        onClick={() => setEditingArticle(article)}
-                        className="text-[13px] text-fresh-grass hover:underline font-medium cursor-pointer"
+                    <td className="py-3.5 text-right space-x-3 whitespace-nowrap">
+                      <Link
+                        href={`/admin/articles/${article.id}/edit`}
+                        className="inline-flex items-center gap-1 text-[13px] text-fresh-grass hover:underline font-medium"
                       >
-                        Edit
-                      </button>
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Edit</span>
+                      </Link>
                       <Link
                         href={`/artikel/${article.slug}`}
                         target="_blank"
-                        className="text-[13px] text-stone-gray hover:text-ink-black hover:underline"
+                        className="inline-flex items-center gap-1 text-[13px] text-stone-gray hover:text-ink-black hover:underline"
                       >
-                        Baca ↗
+                        <span>Baca</span>
+                        <ExternalLink className="w-3 h-3" />
                       </Link>
                       <button
                         onClick={async () => {
@@ -186,9 +146,10 @@ export function AdminArticlesPage({
                             await deleteArticleAction(article.id);
                           }
                         }}
-                        className="text-[13px] text-coral-pop hover:underline ml-2 cursor-pointer"
+                        className="inline-flex items-center gap-1 text-[13px] text-coral-pop hover:underline cursor-pointer"
                       >
-                        Hapus
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Hapus</span>
                       </button>
                     </td>
                   </tr>
@@ -200,360 +161,19 @@ export function AdminArticlesPage({
           <div className="text-center py-16 text-stone-gray">
             <FileText className="w-10 h-10 text-stone-gray/60 mx-auto mb-2" />
             <p className="font-medium text-ink-black">Belum ada artikel yang ditulis.</p>
-            <p className="text-[13px] text-stone-gray mt-1">
-              Klik tombol &quot;+ Tulis Artikel Baru&quot; di atas untuk membuat postingan pertama.
+            <p className="text-[13px] text-stone-gray mt-1 mb-4">
+              Mulai buat ulasan produk software bisnis dengan editor rich text.
             </p>
+            <Link
+              href="/admin/articles/new"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-fresh-grass text-ink-black font-semibold text-[14px] hover:opacity-90 transition-opacity"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Tulis Artikel Baru</span>
+            </Link>
           </div>
         )}
       </Card>
-
-      {/* Modal Tulis Artikel Baru */}
-      {isAddModalOpen && (
-        <Modal
-          isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
-          title="Tulis Artikel Baru"
-          description="Publikasikan ulasan komparasi software bisnis dan tautkan produk marketplace Kodeva."
-          maxWidth="lg"
-        >
-          <form action={createAction} className="space-y-4">
-            {createState.error && (
-              <div className="p-3.5 rounded-[16px] bg-coral-pop/10 text-coral-pop text-[14px] border border-coral-pop/20 font-medium">
-                {createState.error}
-              </div>
-            )}
-            {createState.success && (
-              <div className="p-3.5 rounded-[16px] bg-fresh-grass/10 text-fresh-grass text-[14px] border border-fresh-grass/20 font-medium">
-                {createState.message || 'Artikel berhasil diterbitkan!'}
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
-                name="title"
-                label="Judul Artikel *"
-                placeholder="Contoh: 5 Software Akuntansi Terbaik di Indonesia"
-                required
-                disabled={isCreating}
-              />
-
-              <Input
-                name="slug"
-                label="Slug URL *"
-                placeholder="contoh: software-akuntansi-terbaik"
-                required
-                disabled={isCreating}
-              />
-            </div>
-
-            {/* Supabase Storage Image Upload */}
-            <ImageUploader
-              name="cover_url"
-              label="Cover Gambar Artikel (Supabase Storage)"
-              folder="articles"
-              helperText="Upload gambar cover blog (PNG/JPG/WebP/AVIF max 2MB)."
-            />
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-[14px] font-medium text-ink-black mb-1.5">
-                  Kategori Artikel
-                </label>
-                <select
-                  name="category_id"
-                  disabled={isCreating}
-                  className="w-full bg-pure-white text-ink-black px-4 py-3 rounded-[20px] border border-hairline-mist focus:border-fresh-grass focus:outline-none text-[15px]"
-                >
-                  <option value="">-- Pilih Kategori --</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[14px] font-medium text-ink-black mb-1.5">
-                  Status Publikasi
-                </label>
-                <select
-                  name="status"
-                  defaultValue="published"
-                  disabled={isCreating}
-                  className="w-full bg-pure-white text-ink-black px-4 py-3 rounded-[20px] border border-hairline-mist focus:border-fresh-grass focus:outline-none text-[15px]"
-                >
-                  <option value="published">Langsung Publikasi</option>
-                  <option value="draft">Simpan sebagai Draft</option>
-                </select>
-              </div>
-
-              <Input
-                name="author_name"
-                label="Nama Penulis"
-                placeholder="Tim Editorial Kodeva"
-                defaultValue="Tim Editorial Kodeva"
-                disabled={isCreating}
-              />
-            </div>
-
-            {/* Tautkan Produk Marketplace */}
-            {products.length > 0 && (
-              <div className="p-4 rounded-[24px] bg-cream-paper border border-hairline-mist space-y-2.5">
-                <div>
-                  <label className="block text-[14px] font-semibold text-ink-black">
-                    Tautkan Produk dari Marketplace
-                  </label>
-                  <p className="text-[12px] text-stone-gray">
-                    Produk yang dipilih akan tampil sebagai rekomendasi langsung di bagian bawah artikel.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
-                  {products.map((prod) => (
-                    <label
-                      key={prod.id}
-                      className="flex items-center gap-3 p-2 rounded-[16px] bg-pure-white border border-hairline-mist/60 hover:border-fresh-grass cursor-pointer transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        name="linked_product_ids"
-                        value={prod.id}
-                        className="w-4 h-4 rounded text-fresh-grass focus:ring-fresh-grass"
-                      />
-                      <div className="relative w-8 h-8 rounded-[8px] bg-sandstone overflow-hidden shrink-0 flex items-center justify-center">
-                        {prod.thumbnail_url ? (
-                          <Image src={prod.thumbnail_url} alt={prod.name} fill className="object-cover" />
-                        ) : (
-                          <Package className="w-4 h-4 text-stone-gray" />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <span className="text-[13px] font-medium text-ink-black block truncate">
-                          {prod.name}
-                        </span>
-                        <span className="text-[11px] text-stone-gray font-mono block truncate">
-                          /produk/{prod.slug}
-                        </span>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <Textarea
-              name="excerpt"
-              label="Ringkasan Singkat (Excerpt)"
-              placeholder="Kutipan 1-2 kalimat untuk kartu artikel dan ringkasan pencarian..."
-              rows={2}
-              disabled={isCreating}
-            />
-
-            {/* Rich Text Editor dengan Toolbar & Live Preview */}
-            <RichTextEditor
-              name="content_html"
-              label="Konten Artikel (Rich Text HTML)"
-              placeholder="<p>Mulai tulis ulasan komparasi software di sini...</p>"
-              rows={7}
-              disabled={isCreating}
-            />
-
-            <div className="pt-2 flex justify-end gap-3">
-              <Button
-                type="button"
-                variant="ghost-pill"
-                onClick={() => setIsAddModalOpen(false)}
-              >
-                Batal
-              </Button>
-              <Button
-                type="submit"
-                variant="grass-pill"
-                disabled={isCreating}
-              >
-                {isCreating ? 'Menerbitkan...' : 'Terbitkan Artikel'}
-              </Button>
-            </div>
-          </form>
-        </Modal>
-      )}
-
-      {/* Modal Edit Artikel */}
-      {editingArticle && (
-        <Modal
-          isOpen={Boolean(editingArticle)}
-          onClose={() => setEditingArticle(null)}
-          title={`Edit Artikel: ${editingArticle.title}`}
-          description="Perbarui konten artikel blog, ganti gambar cover, atau tautkan produk marketplace."
-          maxWidth="lg"
-        >
-          <form action={updateAction} className="space-y-4">
-            <input type="hidden" name="id" value={editingArticle.id} />
-
-            {updateState.error && (
-              <div className="p-3.5 rounded-[16px] bg-coral-pop/10 text-coral-pop text-[14px] border border-coral-pop/20 font-medium">
-                {updateState.error}
-              </div>
-            )}
-            {updateState.success && (
-              <div className="p-3.5 rounded-[16px] bg-fresh-grass/10 text-fresh-grass text-[14px] border border-fresh-grass/20 font-medium">
-                {updateState.message || 'Artikel berhasil diperbarui!'}
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
-                name="title"
-                label="Judul Artikel *"
-                defaultValue={editingArticle.title}
-                required
-                disabled={isUpdating}
-              />
-
-              <Input
-                name="slug"
-                label="Slug URL *"
-                defaultValue={editingArticle.slug}
-                required
-                disabled={isUpdating}
-              />
-            </div>
-
-            {/* Supabase Storage Image Upload */}
-            <ImageUploader
-              name="cover_url"
-              label="Cover Gambar Artikel (Supabase Storage)"
-              folder="articles"
-              defaultValue={editingArticle.cover_url}
-              helperText="Upload gambar cover baru atau pertahankan cover yang ada."
-            />
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-[14px] font-medium text-ink-black mb-1.5">
-                  Kategori Artikel
-                </label>
-                <select
-                  name="category_id"
-                  defaultValue={editingArticle.category_id || ''}
-                  disabled={isUpdating}
-                  className="w-full bg-pure-white text-ink-black px-4 py-3 rounded-[20px] border border-hairline-mist focus:border-fresh-grass focus:outline-none text-[15px]"
-                >
-                  <option value="">-- Pilih Kategori --</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[14px] font-medium text-ink-black mb-1.5">
-                  Status Publikasi
-                </label>
-                <select
-                  name="status"
-                  defaultValue={editingArticle.status}
-                  disabled={isUpdating}
-                  className="w-full bg-pure-white text-ink-black px-4 py-3 rounded-[20px] border border-hairline-mist focus:border-fresh-grass focus:outline-none text-[15px]"
-                >
-                  <option value="published">Publikasi</option>
-                  <option value="draft">Draft</option>
-                </select>
-              </div>
-
-              <Input
-                name="author_name"
-                label="Nama Penulis"
-                defaultValue={editingArticle.author_name || 'Tim Editorial Kodeva'}
-                disabled={isUpdating}
-              />
-            </div>
-
-            {/* Tautkan Produk Marketplace */}
-            {products.length > 0 && (
-              <div className="p-4 rounded-[24px] bg-cream-paper border border-hairline-mist space-y-2.5">
-                <div>
-                  <label className="block text-[14px] font-semibold text-ink-black">
-                    Tautkan Produk dari Marketplace
-                  </label>
-                  <p className="text-[12px] text-stone-gray">
-                    Pilih produk yang direkomendasikan pada artikel ini.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
-                  {products.map((prod) => (
-                    <label
-                      key={prod.id}
-                      className="flex items-center gap-3 p-2 rounded-[16px] bg-pure-white border border-hairline-mist/60 hover:border-fresh-grass cursor-pointer transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        name="linked_product_ids"
-                        value={prod.id}
-                        defaultChecked={editingArticle.linked_product_ids?.includes(prod.id)}
-                        className="w-4 h-4 rounded text-fresh-grass focus:ring-fresh-grass"
-                      />
-                      <div className="relative w-8 h-8 rounded-[8px] bg-sandstone overflow-hidden shrink-0 flex items-center justify-center">
-                        {prod.thumbnail_url ? (
-                          <Image src={prod.thumbnail_url} alt={prod.name} fill className="object-cover" />
-                        ) : (
-                          <Package className="w-4 h-4 text-stone-gray" />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <span className="text-[13px] font-medium text-ink-black block truncate">
-                          {prod.name}
-                        </span>
-                        <span className="text-[11px] text-stone-gray font-mono block truncate">
-                          /produk/{prod.slug}
-                        </span>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <Textarea
-              name="excerpt"
-              label="Ringkasan Singkat (Excerpt)"
-              defaultValue={editingArticle.excerpt || ''}
-              rows={2}
-              disabled={isUpdating}
-            />
-
-            {/* Rich Text Editor dengan Toolbar & Live Preview */}
-            <RichTextEditor
-              name="content_html"
-              label="Konten Artikel (Rich Text HTML)"
-              defaultValue={editingArticle.content_html || ''}
-              rows={7}
-              disabled={isUpdating}
-            />
-
-            <div className="pt-2 flex justify-end gap-3">
-              <Button
-                type="button"
-                variant="ghost-pill"
-                onClick={() => setEditingArticle(null)}
-              >
-                Batal
-              </Button>
-              <Button
-                type="submit"
-                variant="grass-pill"
-                disabled={isUpdating}
-              >
-                {isUpdating ? 'Menyimpan...' : 'Simpan Perubahan'}
-              </Button>
-            </div>
-          </form>
-        </Modal>
-      )}
     </div>
   );
 }

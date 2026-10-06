@@ -19,6 +19,10 @@ export function ArticleContent({ contentHtml, className }: ArticleContentProps) 
         '[&_blockquote]:border-l-4 [&_blockquote]:border-fresh-grass [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-stone-gray [&_blockquote]:my-6',
         '[&_img]:rounded-[30px] [&_img]:my-8 [&_img]:border [&_img]:border-hairline-mist',
         '[&_a]:text-ink-black [&_a]:underline [&_a]:decoration-fresh-grass [&_a]:decoration-2 [&_a]:underline-offset-4',
+        '[&_code]:bg-sandstone/50 [&_code]:text-ink-black [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded-md [&_code]:font-mono [&_code]:text-[14px]',
+        '[&_pre]:bg-ink-black [&_pre]:text-pure-white [&_pre]:p-5 [&_pre]:rounded-[20px] [&_pre]:overflow-x-auto [&_pre]:font-mono [&_pre]:text-[14px] [&_pre]:my-6',
+        '[&_hr]:my-8 [&_hr]:border-hairline-mist',
+        '[&_s]:line-through [&_s]:text-stone-gray',
         className
       )}
       dangerouslySetInnerHTML={{ __html: contentHtml }}

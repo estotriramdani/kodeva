@@ -9,6 +9,8 @@ export interface ActionState {
   success?: boolean;
   error?: string;
   message?: string;
+  articleId?: string;
+  slug?: string;
 }
 
 export async function createArticleAction(
@@ -106,6 +108,8 @@ export async function createArticleAction(
   return {
     success: true,
     message: `Artikel "${title}" berhasil disimpan!`,
+    articleId: newArticle?.id,
+    slug,
   };
 }
 
@@ -206,6 +210,8 @@ export async function updateArticleAction(
   return {
     success: true,
     message: `Artikel "${title}" berhasil diperbarui!`,
+    articleId: id,
+    slug,
   };
 }
 
