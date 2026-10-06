@@ -6,10 +6,11 @@ export interface ListProductsOptions {
   marketCode?: string;
   categorySlug?: string;
   searchQuery?: string;
+  sortBy?: 'default' | 'price-asc' | 'price-desc' | string;
 }
 
 export async function listProducts(options: ListProductsOptions = {}): Promise<Product[]> {
-  const { marketCode = DEFAULT_MARKET_CODE, categorySlug, searchQuery } = options;
+  const { marketCode = DEFAULT_MARKET_CODE, categorySlug, searchQuery, sortBy } = options;
   const supabase = await createServerClient();
 
   let query = supabase
@@ -48,6 +49,20 @@ export async function listProducts(options: ListProductsOptions = {}): Promise<P
 
   if (categorySlug && categorySlug !== 'semua') {
     results = results.filter((p) => p.category?.slug === categorySlug);
+  }
+
+  if (sortBy === 'price-asc') {
+    results.sort((a, b) => {
+      const priceA = a.plans && a.plans.length > 0 ? Math.min(...a.plans.map((p) => p.promo_price || p.price)) : 0;
+      const priceB = b.plans && b.plans.length > 0 ? Math.min(...b.plans.map((p) => p.promo_price || p.price)) : 0;
+      return priceA - priceB;
+    });
+  } else if (sortBy === 'price-desc') {
+    results.sort((a, b) => {
+      const priceA = a.plans && a.plans.length > 0 ? Math.min(...a.plans.map((p) => p.promo_price || p.price)) : 0;
+      const priceB = b.plans && b.plans.length > 0 ? Math.min(...b.plans.map((p) => p.promo_price || p.price)) : 0;
+      return priceB - priceA;
+    });
   }
 
   return results;

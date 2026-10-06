@@ -1,8 +1,11 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { Container, Button } from '@/shared/ui';
 import { ProductCard, type Product } from '@/entities/product';
 import { ClaimPromoButton } from '@/features/claim-promo';
+import { trackLandingCta } from '@/shared/lib/analytics';
 
 export interface FeaturedProductsSectionProps {
   products: Product[];
@@ -30,7 +33,12 @@ export function FeaturedProductsSection({
               {subtitle}
             </p>
           </div>
-          <Link href="/produk">
+          <Link
+            href="/produk"
+            onClick={() =>
+              trackLandingCta('Lihat Semua Produk', 'featured_products_section', '/produk')
+            }
+          >
             <Button variant="ghost-pill" size="md" dotColor="grass">
               Lihat Semua Produk
             </Button>

@@ -1,9 +1,12 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Check } from 'lucide-react';
 import { Card, Badge, Button } from '@/shared/ui';
 import { formatIDR } from '@/shared/lib';
+import { trackLandingCta } from '@/shared/lib/analytics';
 import type { Product } from '../model/types';
 import { PromoQuotaBadge } from './PromoQuotaBadge';
 
@@ -93,7 +96,12 @@ export function ProductCard({ product, actionSlot }: ProductCardProps) {
           {actionSlot ? (
             actionSlot
           ) : (
-            <Link href={`/produk/${product.slug}`}>
+            <Link
+              href={`/produk/${product.slug}`}
+              onClick={() =>
+                trackLandingCta(`Detail: ${product.name}`, 'product_card', `/produk/${product.slug}`)
+              }
+            >
               <Button size="sm" variant="ghost-pill" dotColor="grass">
                 Detail
               </Button>

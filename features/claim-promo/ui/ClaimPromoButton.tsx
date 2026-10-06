@@ -4,6 +4,7 @@ import React, { useState, useCallback } from 'react';
 import { Tag } from 'lucide-react';
 import { Button, Modal } from '@/shared/ui';
 import { LeadForm } from '@/features/submit-lead';
+import { trackLandingCta } from '@/shared/lib/analytics';
 
 export interface ClaimPromoButtonProps {
   productName: string;
@@ -22,7 +23,10 @@ export function ClaimPromoButton({
 }: ClaimPromoButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleOpen = useCallback(() => setIsOpen(true), []);
+  const handleOpen = useCallback(() => {
+    trackLandingCta(`Klaim Promo: ${productName}${planTier ? ` (${planTier})` : ''}`, 'claim_promo_button', '#promo_modal');
+    setIsOpen(true);
+  }, [productName, planTier]);
   const handleClose = useCallback(() => setIsOpen(false), []);
 
   const tierTitle = planTier ? `Paket ${planTier.toUpperCase()}` : '';

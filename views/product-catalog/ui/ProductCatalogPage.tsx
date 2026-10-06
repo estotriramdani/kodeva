@@ -2,7 +2,7 @@ import React from 'react';
 import { Container } from '@/shared/ui';
 import { ProductCard, type Product } from '@/entities/product';
 import type { Category } from '@/entities/category';
-import { CategoryFilterPills, ProductSearchBar } from '@/features/filter-products';
+import { CategoryFilterPills, ProductSearchBar, ProductSortSelector } from '@/features/filter-products';
 import { ClaimPromoButton } from '@/features/claim-promo';
 import { Search } from 'lucide-react';
 
@@ -11,6 +11,7 @@ export interface ProductCatalogPageProps {
   categories: Category[];
   activeCategory?: string;
   searchQuery?: string;
+  activeSort?: string;
 }
 
 export function ProductCatalogPage({
@@ -18,6 +19,7 @@ export function ProductCatalogPage({
   categories,
   activeCategory = 'semua',
   searchQuery = '',
+  activeSort = 'default',
 }: ProductCatalogPageProps) {
   return (
     <div className="py-10 sm:py-16">
@@ -32,13 +34,18 @@ export function ProductCatalogPage({
           </p>
         </div>
 
-        {/* Filter Bar & Search */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-10 pb-6 border-b border-hairline-mist">
-          <CategoryFilterPills
-            categories={categories}
-            activeCategory={activeCategory}
-          />
-          <ProductSearchBar defaultValue={searchQuery} />
+        {/* Filter Bar, Search & Sort */}
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 mb-10 pb-6 border-b border-hairline-mist">
+          <div className="flex-1 min-w-0">
+            <CategoryFilterPills
+              categories={categories}
+              activeCategory={activeCategory}
+            />
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <ProductSortSelector activeSort={activeSort} />
+            <ProductSearchBar defaultValue={searchQuery} />
+          </div>
         </div>
 
         {/* Product Grid */}

@@ -13,17 +13,19 @@ type Props = {
   searchParams: Promise<{
     kategori?: string;
     q?: string;
+    sort?: string;
   }>;
 };
 
 export default async function Page({ searchParams }: Props) {
-  const { kategori, q } = await searchParams;
+  const { kategori, q, sort } = await searchParams;
 
   const [categories, products] = await Promise.all([
     getCategories('product'),
     listProducts({
       categorySlug: kategori,
       searchQuery: q,
+      sortBy: sort,
     }),
   ]);
 
@@ -33,6 +35,7 @@ export default async function Page({ searchParams }: Props) {
       categories={categories}
       activeCategory={kategori || 'semua'}
       searchQuery={q || ''}
+      activeSort={sort || 'default'}
     />
   );
 }
