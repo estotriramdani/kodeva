@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { CheckCircle2 } from 'lucide-react';
 import { Container, Button, Modal } from '@/shared/ui';
 import { HeroHeadline, type LandingHero } from '@/entities/hero';
@@ -20,6 +21,8 @@ export function HeroSection({ heroData }: HeroSectionProps) {
     heroData?.subtitle ||
     'Temukan, bandingkan, dan dapatkan lisensi SaaS resmi dengan potongan harga promo khusus di pasar Indonesia.';
   const campaignName = heroData?.campaign_name || 'Promo Lisensi 2026';
+  const imageUrl = heroData?.image_url;
+  const imageAlt = heroData?.image_alt || title;
 
   return (
     <section className="relative overflow-hidden pt-6 pb-16 sm:pb-24">
@@ -59,24 +62,45 @@ export function HeroSection({ heroData }: HeroSectionProps) {
           }
         />
 
-        {/* Paper-Cut Illustration Panel (MindMarket Aesthetic) */}
-        <div className="mt-8 relative max-w-4xl mx-auto h-52 sm:h-72 rounded-[63.75px] bg-sandstone/70 border border-hairline-mist/80 p-8 flex items-center justify-center overflow-hidden">
-          {/* Flat Paper-Cut Decorative Character Shapes */}
-          <div className="absolute -left-6 -bottom-6 w-32 h-32 rounded-full bg-fresh-grass/80 transform rotate-12" />
-          <div className="absolute left-1/4 -top-8 w-24 h-40 rounded-[40px] bg-sky-pop/75 transform -rotate-12" />
-          <div className="absolute right-1/4 -bottom-10 w-36 h-36 rounded-[50px] bg-coral-pop/80 transform rotate-45" />
-          <div className="absolute -right-4 -top-4 w-28 h-28 rounded-full bg-sunshine-pop/85" />
-
-          {/* Central Editorial Badge */}
-          <div className="relative z-10 bg-pure-white rounded-[40px] px-6 sm:px-10 py-5 sm:py-6 text-center border border-hairline-mist max-w-md">
-            <span className="text-[13px] font-semibold text-fresh-grass uppercase tracking-wider inline-flex items-center gap-1.5 mb-1">
-              <CheckCircle2 className="w-4 h-4" /> 100% Lisensi Resmi & Terpercaya
-            </span>
-            <p className="text-[16px] sm:text-[18px] font-medium text-ink-black leading-snug">
-              Bandingkan fitur ERP, POS, CRM, & HRIS langsung dengan konsultan ahli.
-            </p>
+        {/* Hero Visual Display: Uploaded Banner Image or Fallback Paper-Cut Illustration */}
+        {imageUrl ? (
+          <div className="mt-8 relative max-w-5xl mx-auto rounded-[35px] sm:rounded-[48px] overflow-hidden border border-hairline-mist shadow-xs bg-white aspect-[16/9] sm:aspect-[21/9]">
+            <Image
+              src={imageUrl}
+              alt={imageAlt}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1100px"
+              className="object-cover object-center"
+            />
+            {/* Subtle editorial trust badge */}
+            <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-10 bg-pure-white/90 backdrop-blur-md rounded-[20px] px-4 py-2 border border-hairline-mist flex items-center gap-2 shadow-xs">
+              <CheckCircle2 className="w-4 h-4 text-fresh-grass" />
+              <span className="text-[12px] sm:text-[13px] font-medium text-ink-black">
+                100% Lisensi Resmi & Terpercaya
+              </span>
+            </div>
           </div>
-        </div>
+        ) : (
+          /* Paper-Cut Illustration Panel (MindMarket Aesthetic) */
+          <div className="mt-8 relative max-w-4xl mx-auto h-52 sm:h-72 rounded-[63.75px] bg-sandstone/70 border border-hairline-mist/80 p-8 flex items-center justify-center overflow-hidden">
+            {/* Flat Paper-Cut Decorative Character Shapes */}
+            <div className="absolute -left-6 -bottom-6 w-32 h-32 rounded-full bg-fresh-grass/80 transform rotate-12" />
+            <div className="absolute left-1/4 -top-8 w-24 h-40 rounded-[40px] bg-sky-pop/75 transform -rotate-12" />
+            <div className="absolute right-1/4 -bottom-10 w-36 h-36 rounded-[50px] bg-coral-pop/80 transform rotate-45" />
+            <div className="absolute -right-4 -top-4 w-28 h-28 rounded-full bg-sunshine-pop/85" />
+
+            {/* Central Editorial Badge */}
+            <div className="relative z-10 bg-pure-white rounded-[40px] px-6 sm:px-10 py-5 sm:py-6 text-center border border-hairline-mist max-w-md">
+              <span className="text-[13px] font-semibold text-fresh-grass uppercase tracking-wider inline-flex items-center gap-1.5 mb-1">
+                <CheckCircle2 className="w-4 h-4" /> 100% Lisensi Resmi & Terpercaya
+              </span>
+              <p className="text-[16px] sm:text-[18px] font-medium text-ink-black leading-snug">
+                Bandingkan fitur ERP, POS, CRM, & HRIS langsung dengan konsultan ahli.
+              </p>
+            </div>
+          </div>
+        )}
       </Container>
 
       {/* Hero Quote Modal */}

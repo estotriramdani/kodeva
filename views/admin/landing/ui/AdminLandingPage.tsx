@@ -223,8 +223,27 @@ export function AdminLandingPage({
             </Card>
           </div>
 
-          {/* Quick Info Sidecard */}
-          <div className="lg:col-span-4">
+          {/* Quick Info & Preview Sidecard */}
+          <div className="lg:col-span-4 space-y-6">
+            {hero?.image_url && (
+              <Card surface="white" className="p-6 rounded-[30px] border border-hairline-mist space-y-3">
+                <h4 className="font-semibold text-ink-black text-[16px]">
+                  🖼️ Banner Aktif Saat Ini
+                </h4>
+                <div className="relative aspect-[16/9] w-full rounded-[20px] overflow-hidden border border-hairline-mist bg-sandstone">
+                  <Image
+                    src={hero.image_url}
+                    alt={hero.image_alt || hero.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <p className="text-[12px] text-stone-gray truncate">
+                  URL: <span className="font-mono text-ink-black">{hero.image_url}</span>
+                </p>
+              </Card>
+            )}
+
             <Card surface="white" className="p-6 rounded-[30px] border border-hairline-mist space-y-4">
               <h4 className="font-semibold text-ink-black text-[16px]">
                 ℹ️ Info Revalidasi

@@ -161,6 +161,32 @@ Dokumen ini disusun sebagai bentuk transparansi dan evaluasi kritis terhadap pen
 
 ---
 
+### Kasus 9: Penanganan RLS Policy Violation pada Hero Banner & Integrasi Gambar Hero Supabase Storage
+* **Deskripsi Kebutuhan & Tantangan:**
+  1. Saat mengedit dan menyimpan konfigurasi Landing Hero di `/admin/landing`, muncul error: `Gagal memperbarui Hero: new row violates row-level security policy for table "landing_hero"`. Saat mengunggah file gambar banner hero juga muncul: `Gagal mengupload ke Supabase Storage: new row violates row-level security policy`.
+  2. File gambar banner hero yang diunggah belum dirender di komponen beranda utama (`HeroSection`).
+* **Akar Masalah (Root Cause):**
+  1. Kebijakan RLS database pada tabel `landing_hero` dan storage bucket `media` mensyaratkan user memiliki profil dengan role `'admin'` atau `'editor'` di `public.profiles` melalui fungsi helper `public.is_editor()`. Akun demo `admin@kodeva.test` di `auth.users` belum terpetakan ke tabel `public.profiles`, sementara `AdminDashboardLayout` sebelumnya melakukan fallback ke role `'admin'` (`adminRole={profile?.role || 'admin'}`) yang menyamarkan ketiadaan profil di database.
+  2. Komponen `HeroSection.tsx` sebelumnya masih menggunakan mock container paper-cut statis dan belum membaca prop `heroData?.image_url`.
+* **Bagaimana Diperbaiki:**
+  1. Menghubungkan user `admin@kodeva.test` ke tabel `public.profiles` dengan role `admin` via SQL berhak PostgreSQL:
+     ```sql
+     insert into public.profiles (id, role, display_name)
+     select id, 'admin', 'Admin Demo'
+     from auth.users where email = 'admin@kodeva.test'
+     on conflict (id) do update set role = excluded.role;
+     ```
+  2. Memperbaiki `AdminDashboardLayout` agar memvalidasi status otorisasi profil dan menampilkan banner peringatan jika akun belum terpetakan ke `public.profiles`.
+  3. Memperbaiki penanganan error RLS pada `updateHeroAction` (`landing.actions.ts`) dan `uploadMediaAction` (`upload.actions.ts`) agar memberikan feedback edukatif bagi administrator.
+  4. Mengintegrasikan `next/image` pada `HeroSection.tsx` dengan `fill`, `priority={true}` (LCP optimization), dan responsive sizes, dengan fallback elegan ke ilustrasi paper-cut saat gambar belum diisi.
+  5. Menambahkan kartu preview banner aktif pada halaman CMS `/admin/landing`.
+* **Verifikasi Hasil Akhir:**
+  1. Pengujian upsert tabel `landing_hero` dan upload file ke Supabase Storage diverifikasi sukses 100% (HTTP 200).
+  2. Banner hero yang diunggah langsung tampil presisi di beranda landing page.
+  3. Lolos pengujian tipe TypeScript (`tsc --noEmit`) dan verifikasi linting (`pnpm lint`) dengan 0 error.
+
+---
+
 ## 4. Bagian Implementasi yang Banyak Dibantu AI & Pengujian Edge Cases
 
 * **Fitur:** *Multi-Tier Product Promo Quota Accumulation Engine* di `entities/cart/model/cart-store.ts`.

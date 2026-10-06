@@ -62,6 +62,12 @@ export async function updateHeroAction(
 
   if (error) {
     console.error('Error updating hero section:', error.message);
+    if (error.code === '42501' || error.message.includes('row-level security')) {
+      return {
+        error:
+          'Gagal memperbarui Hero: Akses ditolak oleh Row-Level Security (RLS) database. Akun Anda belum memiliki hak akses editor/admin di tabel public.profiles.',
+      };
+    }
     return { error: `Gagal memperbarui Hero: ${error.message}` };
   }
 

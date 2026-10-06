@@ -87,6 +87,16 @@ export async function uploadMediaAction(formData: FormData): Promise<UploadResul
 
     if (uploadError) {
       console.error('Supabase storage upload error:', uploadError);
+      if (
+        uploadError.message?.includes('row-level security') ||
+        uploadError.message?.includes('violates row-level security')
+      ) {
+        return {
+          success: false,
+          error:
+            'Gagal mengupload ke Supabase Storage: Akses ditolak oleh Row-Level Security (RLS). Akun Anda belum terdaftar sebagai editor/admin di tabel public.profiles.',
+        };
+      }
       return {
         success: false,
         error: `Gagal mengupload ke Supabase Storage: ${uploadError.message}`,
