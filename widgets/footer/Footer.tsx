@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { Lock } from 'lucide-react';
 import { Container } from '@/shared/ui';
 import { SITE_CONFIG } from '@/shared/config';
 
@@ -44,6 +45,15 @@ export function Footer() {
                   Artikel & Edukasi
                 </Link>
               </li>
+              <li className="pt-1">
+                <Link
+                  href="/admin/login"
+                  className="hover:underline inline-flex items-center gap-1.5 font-medium text-ink-black/90 hover:text-ink-black"
+                >
+                  <Lock className="w-3.5 h-3.5 shrink-0" />
+                  <span>Login Admin CMS</span>
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -81,9 +91,16 @@ export function Footer() {
         {/* Baris Bawah */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-ink-black/70">
           <p>© {new Date().getFullYear()} {SITE_CONFIG.name}. Seluruh hak cipta dilindungi.</p>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap items-center gap-5 sm:gap-6">
             <span>Privasi & Keamanan</span>
             <span>Syarat & Ketentuan</span>
+            <Link
+              href="/admin/login"
+              className="inline-flex items-center gap-1.5 font-medium text-ink-black/80 hover:text-ink-black hover:underline"
+            >
+              <Lock className="w-3.5 h-3.5 shrink-0" />
+              <span>Login Admin</span>
+            </Link>
           </div>
         </div>
       </Container>
