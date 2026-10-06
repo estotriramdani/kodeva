@@ -228,20 +228,9 @@ Untuk mencegah *Race Condition* (*over-selling* di mana kuota tersisa 1 tetapi 2
 
 Pengukuran performa dilakukan pada **Halaman Beranda (Landing Page)** menggunakan simulasi perangkat seluler (*Mobile Emulation*):
 
-| Metrik | Skor / Nilai | Keterangan |
-|:---|:---:|:---|
-| **Performance** | **94 / 100** | ✅ Jauh melampaui target minimum (≥ 80) |
-| **Accessibility** | **96 / 100** | Kontras warna teks, tag alt gambar, dan atribut ARIA terpenuhi |
-| **Best Practices** | **100 / 100** | HTTPS, modern image formats (WebP/AVIF), no deprecated APIs |
-| **SEO** | **100 / 100** | Semantic HTML5, dynamic OpenGraph, dan Meta Description |
+[Detail Hasil Lighthouse (HTML file)](./lighthouse-detail-report.html)
 
-### Snapshot Pengukuran Web Vitals:
-* **First Contentful Paint (FCP):** ~0.9s
-* **Largest Contentful Paint (LCP):** ~1.4s
-* **Total Blocking Time (TBT):** ~20ms
-* **Cumulative Layout Shift (CLS):** 0.001
-
-*(Screenshot hasil audit terlampir pada dokumen laporan atau dapat diverifikasi langsung melalui Chrome DevTools Lighthouse pada versi production).*
+![lighthouse-mobile](lighthouse-mobile.png)
 
 ---
 
