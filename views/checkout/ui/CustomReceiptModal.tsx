@@ -127,7 +127,7 @@ export function CustomReceiptModal({ isOpen, onClose, order }: CustomReceiptModa
       role="dialog"
       aria-modal="true"
       aria-labelledby="receipt-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-ink-black/60 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-hidden bg-ink-black/60 backdrop-blur-xs"
     >
       <style>{`
         @media print {
@@ -160,9 +160,9 @@ export function CustomReceiptModal({ isOpen, onClose, order }: CustomReceiptModa
       <div className="fixed inset-0" onClick={onClose} aria-hidden="true" />
 
       {/* Receipt Paper Container */}
-      <div className="relative w-full max-w-2xl bg-pure-white rounded-[36px] border border-hairline-mist shadow-2xl z-10 overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-2xl bg-pure-white rounded-[36px] border border-hairline-mist shadow-2xl z-10 overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[88vh] animate-in fade-in zoom-in-95 duration-200">
         {/* Receipt Header Bar (Action & Close) */}
-        <div className="no-print bg-cream-paper/70 px-6 py-4 border-b border-hairline-mist flex items-center justify-between">
+        <div className="no-print shrink-0 bg-cream-paper/70 px-6 py-4 border-b border-hairline-mist flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-fresh-grass" />
             <span className="text-xs font-semibold uppercase tracking-wider text-ink-black">
@@ -209,7 +209,7 @@ export function CustomReceiptModal({ isOpen, onClose, order }: CustomReceiptModa
         </div>
 
         {/* Printable Receipt Paper Canvas */}
-        <div id="kodeva-printable-receipt" className="p-6 sm:p-10 space-y-6 text-ink-black">
+        <div id="kodeva-printable-receipt" className="p-6 sm:p-10 space-y-6 text-ink-black flex-1 overflow-y-auto overscroll-contain">
           {/* Header & Logo */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-hairline-mist">
             <div>
