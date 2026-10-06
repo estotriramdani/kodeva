@@ -12,6 +12,7 @@ export interface ClaimPromoButtonProps {
   planTier?: string;
   quotaRemaining?: number;
   className?: string;
+  size?: 'sm' | 'md' | 'lg';
 }
 
 export function ClaimPromoButton({
@@ -20,6 +21,7 @@ export function ClaimPromoButton({
   planTier,
   quotaRemaining,
   className,
+  size = 'sm',
 }: ClaimPromoButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -36,7 +38,7 @@ export function ClaimPromoButton({
     <>
       <Button
         variant="coral-pill"
-        size="md"
+        size={size}
         onClick={handleOpen}
         className={className}
       >

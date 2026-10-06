@@ -1,12 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Check } from 'lucide-react';
+import { Check, ShoppingBag } from 'lucide-react';
 import { Card, Badge, Button } from '@/shared/ui';
 import { formatIDR } from '@/shared/lib';
-import { trackLandingCta } from '@/shared/lib/analytics';
+import { trackLandingCta, trackAddToCart } from '@/shared/lib/analytics';
+import { useCart } from '@/entities/cart';
 import type { Product } from '../model/types';
 import { PromoQuotaBadge } from './PromoQuotaBadge';
 
@@ -16,10 +17,64 @@ export interface ProductCardProps {
 }
 
 export function ProductCard({ product, actionSlot }: ProductCardProps) {
+  const { addItem, setDrawerOpen } = useCart();
+  const [isAdded, setIsAdded] = useState(false);
+
+  const plans = product.plans || [];
+  const defaultPlan = plans.find((p) => p.tier === 'pro') || plans[0];
+
   // Hitung harga termurah dari paket yang ada
   const lowestPrice = product.plans && product.plans.length > 0
     ? Math.min(...product.plans.map((p) => p.promo_price || p.price))
     : null;
+
+  const handleQuickAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!defaultPlan) return;
+
+    const tierLabels: Record<string, string> = {
+      basic: 'Paket Basic',
+      pro: 'Paket Pro',
+      business: 'Paket Business',
+    };
+    const planDisplayName = tierLabels[defaultPlan.tier] || defaultPlan.tier;
+    const currentPrice = defaultPlan.promo_price || defaultPlan.price;
+
+    const res = addItem({
+      productId: product.id,
+      productSlug: product.slug,
+      productName: product.name,
+      productThumbnail: product.thumbnail_url,
+      planId: `${defaultPlan.id}_monthly`,
+      planTier: defaultPlan.tier,
+      planName: `${planDisplayName} (Bulanan)`,
+      unitName: `${defaultPlan.unit}/bulan`,
+      price: defaultPlan.price,
+      promoPrice: defaultPlan.promo_price,
+      quantity: 1,
+      promoQuotaRemaining: product.promo_quota_remaining,
+    });
+
+    if (!res.success) {
+      alert(res.error || 'Gagal menambahkan ke keranjang karena melebihi kuota promo.');
+      return;
+    }
+
+    trackAddToCart({
+      itemId: `${product.slug}_${defaultPlan.tier}`,
+      itemName: product.name,
+      planTier: defaultPlan.tier,
+      category: product.category?.name,
+      price: currentPrice,
+      quantity: 1,
+    });
+
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 1800);
+    setDrawerOpen(true);
+  };
 
   return (
     <Card
@@ -38,7 +93,10 @@ export function ProductCard({ product, actionSlot }: ProductCardProps) {
         </div>
 
         {/* Thumbnail / Ilustrasi */}
-        <div className="relative w-full h-44 rounded-[30px] bg-cream-paper overflow-hidden mb-5 flex items-center justify-center">
+        <Link
+          href={`/produk/${product.slug}`}
+          className="block relative w-full h-44 rounded-[30px] bg-cream-paper overflow-hidden mb-5 group-hover:opacity-95 transition-opacity"
+        >
           {product.thumbnail_url ? (
             <Image
               src={product.thumbnail_url}
@@ -47,11 +105,11 @@ export function ProductCard({ product, actionSlot }: ProductCardProps) {
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div className="text-stone-gray/40 text-4xl font-bold uppercase tracking-wider select-none">
+            <div className="w-full h-full flex items-center justify-center text-stone-gray/40 text-4xl font-bold uppercase tracking-wider select-none">
               {product.name.slice(0, 2)}
             </div>
           )}
-        </div>
+        </Link>
 
         {/* Informasi Produk */}
         <h3 className="text-[24px] font-medium text-ink-black leading-snug group-hover:text-ink-black/80 transition-colors">
@@ -81,7 +139,7 @@ export function ProductCard({ product, actionSlot }: ProductCardProps) {
       </div>
 
       {/* Footer Kartu: Harga & Tombol Aksi */}
-      <div className="pt-6 mt-6 border-t border-hairline-mist/50 flex items-center justify-between gap-3">
+      <div className="pt-5 mt-5 border-t border-hairline-mist/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <span className="text-[12px] text-stone-gray block">Mulai dari</span>
           <span className="text-[18px] font-semibold text-ink-black">
@@ -92,7 +150,22 @@ export function ProductCard({ product, actionSlot }: ProductCardProps) {
           )}
         </div>
 
-        <div>
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          {defaultPlan && (
+            <Button
+              type="button"
+              size="sm"
+              variant={isAdded ? 'grass-pill' : 'ghost-pill'}
+              dotColor={isAdded ? undefined : 'grass'}
+              onClick={handleQuickAddToCart}
+              className="text-[13px] px-3 py-1.5 inline-flex items-center gap-1.5 transition-all"
+              title={`Tambah ${product.name} (${defaultPlan.tier.toUpperCase()}) ke Keranjang`}
+            >
+              <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
+              <span>{isAdded ? 'Ditambahkan!' : '+ Keranjang'}</span>
+            </Button>
+          )}
+
           {actionSlot ? (
             actionSlot
           ) : (
@@ -102,7 +175,7 @@ export function ProductCard({ product, actionSlot }: ProductCardProps) {
                 trackLandingCta(`Detail: ${product.name}`, 'product_card', `/produk/${product.slug}`)
               }
             >
-              <Button size="sm" variant="ghost-pill" dotColor="grass">
+              <Button size="sm" variant="ghost-pill">
                 Detail
               </Button>
             </Link>
