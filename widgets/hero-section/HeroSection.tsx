@@ -7,10 +7,9 @@ import {
   CheckCircle2,
   ShieldCheck,
   Zap,
-  Sparkles,
+  CircleDollarSign,
   Star,
   Lock,
-  ArrowUpRight,
   TrendingUp,
 } from 'lucide-react';
 import { Container, Button, Modal } from '@/shared/ui';
@@ -60,7 +59,6 @@ export function HeroSection({ heroData }: HeroSectionProps) {
                     setIsModalOpen(true);
                   }}
                 >
-                  <Sparkles className="w-4 h-4 mr-1.5" />
                   {heroData?.cta_label || 'Dapatkan Penawaran Promo'}
                 </Button>
                 <Link
@@ -70,8 +68,7 @@ export function HeroSection({ heroData }: HeroSectionProps) {
                   }}
                 >
                   <Button variant="ghost-pill" size="lg" dotColor="grass">
-                    <span>Jelajahi Katalog</span>
-                    <ArrowUpRight className="w-4 h-4 ml-1" />
+                    Jelajahi Katalog
                   </Button>
                 </Link>
               </div>
@@ -129,7 +126,7 @@ export function HeroSection({ heroData }: HeroSectionProps) {
           {/* Floating Micro-Badge 2: Kanan Atas (Promo Kuota) */}
           <div className="hidden lg:flex items-center gap-3 absolute -top-5 -right-6 z-20 bg-pure-white/95 backdrop-blur-md px-4 py-3 rounded-[24px] border border-hairline-mist shadow-xs hover:-translate-y-1 transition-transform">
             <div className="w-9 h-9 rounded-[14px] bg-coral-pop/15 text-coral-pop flex items-center justify-center font-bold">
-              <Sparkles className="w-5 h-5" />
+              <CircleDollarSign className="w-5 h-5" />
             </div>
             <div>
               <p className="text-[13px] font-semibold text-ink-black leading-tight">
@@ -250,7 +247,7 @@ export function HeroSection({ heroData }: HeroSectionProps) {
               </span>
             </div>
             <div className="flex items-center gap-2 p-2.5 rounded-[16px] bg-pure-white border border-hairline-mist">
-              <Sparkles className="w-4 h-4 text-coral-pop shrink-0" />
+              <CircleDollarSign className="w-4 h-4 text-coral-pop shrink-0" />
               <span className="text-[12px] font-semibold text-ink-black truncate">
                 Hemat s/d 40%
               </span>
