@@ -115,13 +115,19 @@ shared/                    # UI Kit MindMarket, Helper Lib, Supabase SSR Clients
   * **Pengurangan Kuota Promo Otomatis (Anti Race Condition):** Saat user mengklaim promo melalui modal *"Amankan Kuota Promo"*, sisa kuota promo produk otomatis berkurang secara atomik di PostgreSQL lewat stored procedure `claim_product_promo_quota` yang thread-safe dari *concurrency race condition*.
 * **Mini Marketplace (Frontend):**
   * Katalog lengkap dengan **6 produk software bisnis UMKM** (POS Kasir, Payroll HR, Gudang Inventory, WhatsApp CRM, Smart Invoice, Resto Kitchen).
-  * **Filter Kategori Interaktif dengan Tombol Geser:** Tombol navigasi Chevron kiri & kanan yang mendeteksi batas scroll horizontal dinamis untuk mempermudah navigasi pada berbagai tipe mouse/laptop.
+  * **Filter Kategori & Pengurutan Harga (Bonus Feature):** Filter kategori dengan tombol scroll Chevron kiri & kanan serta **Sorting berdasarkan Harga (Termurah & Tertinggi)** yang tersinkronisasi ke query URL (`?kategori=...&sort=...`).
   * Detail produk interaktif: Pilihan paket (*Basic, Pro, Business*) yang **langsung mengubah harga satuan, kalkulasi unit, dan estimasi hemat**.
+  * **Pilihan Durasi Langganan (Bonus Feature):** Toggle Tagihan Bulanan vs **Tahunan (Hemat 20% / Setara 2 Bulan Gratis)** yang langsung mengkalkulasi ulang harga unit dan total investasi.
+  * **Tabel Perbandingan Fitur Antar Paket (Bonus Feature):** Matriks komparasi kapabilitas teknis antar tier lisensi (*Basic, Pro, Business*) pada `PricingTable`.
   * **Keranjang Belanja (Cart Drawer & Floating Cart Button):** Tambah lisensi, ubah kuantitas, hapus item, auto-calculate subtotal & diskon, persistensi `localStorage`.
   * **Validasi Kuota Promo Lintas Paket (Critical Rule #4):** Deteksi kelebihan total kuota produk lintas tier dan pemblokiran checkout secara otomatis.
   * **Halaman Checkout & Tanda Terima Digital Kustom:** Form data pembeli (Nama, Email, WhatsApp) dengan validasi format, ringkasan pesanan, input voucher diskon (`KODEVAHEMAT`), **Simulasi Pembayaran (Status Sukses & Status Gagal)**, serta **Tanda Terima Pembayaran Digital Kustom (`CustomReceiptModal`)** yang menggantikan browser print mentah dengan rincian lisensi software resmi, tombol salin teks ke clipboard (format WhatsApp/Email), dan stylesheet cetak terisolasi (`@media print`).
+* **State Handling Lengkap (Requirement B.6):**
+  * **Loading State:** Suspense skeleton placeholder di `app/(marketing)/loading.tsx` untuk transisi halaman mobile yang mulus.
+  * **Error State:** Error boundary kustom di `app/error.tsx` menangani kegagalan API/jaringan/server dengan tombol coba ulang (*retry*) dan log diagnostik.
+  * **Empty State:** Desain khusus untuk kondisi Keranjang Kosong di `CheckoutPage`, Hasil Pencarian Kosong di `ProductCatalogPage`, serta **Halaman 404 Kustom di `app/not-found.tsx`** saat produk/slug tidak ditemukan.
 * **Kebutuhan Marketing & UI/UX:**
-  * **GA4 `dataLayer` Tracking:** Event `view_item`, `add_to_cart`, `begin_checkout`, `purchase`, dan klik CTA landing page terkirim dengan payload lengkap, bebas duplikasi re-render, serta dilengkapi konsol log informatif.
+  * **GA4 `dataLayer` Tracking Menyeluruh:** Event `view_item`, `add_to_cart`, `begin_checkout`, `purchase`, dan klik CTA landing page (`landing_cta_click` pada Hero CTA, 'Lihat Semua Produk', 'Klaim Promo', dan kartu produk) terkirim dengan payload lengkap, bebas duplikasi re-render, serta dilengkapi konsol log informatif.
   * **UTM Attribution Persistence:** Parameter UTM (`utm_source`, `utm_campaign`, dll.) dari TikTok/Instagram ditangkap otomatis pada sesi landing page, disimpan di browser, dan diteruskan ke form Lead serta payload Order Checkout.
   * **Blog Edukasi:** 4 artikel bisnis UMKM dengan URL slug SEO-friendly, kontrol **Pagination (`?page=1`)**, dan komponen **Produk Tertaut (*Linked Products*)**.
   * **Modernisasi Iconography Bebas AI Slop:** Menghilangkan seluruh penggunaan emoji liar di dashboard admin, kartu metrik, sidebar, katalog, dan konfigurasi checkout, menggantikannya dengan icon set presisi dan profesional dari `lucide-react`.

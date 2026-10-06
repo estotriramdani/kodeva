@@ -145,6 +145,22 @@ Dokumen ini disusun sebagai bentuk transparansi dan evaluasi kritis terhadap pen
 
 ---
 
+### Kasus 8: Implementasi State Handling Komprehensif (Loading, Error Boundary, & Not-Found)
+* **Deskripsi Kebutuhan & Tantangan:**
+  Requirement B.6 mewajibkan penanganan kondisi *Loading*, *Error*, dan *Empty* (seperti keranjang kosong, produk tidak ditemukan, dan mock API / database failure). Pada implementasi awal, aplikasi hanya menangani state kosong di level komponen UI (`CheckoutPage` dan `ProductCatalogPage`), namun belum memiliki penanganan level framework untuk:
+  1. Halaman 404 terpadu saat `notFound()` dipicu pada rute detail slug (`/produk/[slug]` atau `/artikel/[slug]`).
+  2. Error boundary runtime untuk menangkap kegagalan pengambilan data remote/database.
+  3. Suspense skeleton visual saat transisi halaman di perangkat seluler.
+* **Bagaimana Diperbaiki:**
+  1. Membangun `app/not-found.tsx` dengan estetika MindMarket (kartu beradius tumpul, icon `SearchX`, deskripsi ramah, dan navigasi cepat kembali ke katalog atau beranda).
+  2. Membangun `app/error.tsx` sebagai Client Component Error Boundary dengan tombol *Coba Muat Ulang* (`reset()`) dan inspeksi detail error teknis.
+  3. Membangun `app/(marketing)/loading.tsx` berisi skeleton animasi pulsasi untuk header, filter pills, dan grid kartu produk/artikel.
+  4. Melengkapi pelacakan GA4 `landing_cta_click` pada tombol *"Lihat Semua Produk"* dan *"Klaim Promo"*.
+* **Verifikasi Hasil Akhir:**
+  Pengujian build `pnpm build` dan `pnpm lint` berjalan sempurna tanpa error, dan rute `/_not-found` kini terkompilasi resmi ke dalam manifest Next.js 16.
+
+---
+
 ## 4. Bagian Implementasi yang Banyak Dibantu AI & Pengujian Edge Cases
 
 * **Fitur:** *Multi-Tier Product Promo Quota Accumulation Engine* di `entities/cart/model/cart-store.ts`.
