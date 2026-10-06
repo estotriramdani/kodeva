@@ -1,4 +1,4 @@
-import { createServerClient } from '@/shared/api/supabase/server';
+import { createPublicClient } from '@/shared/api/supabase/server';
 import type { Product, ProductPlan, ProductScreenshot } from '../model/types';
 import { DEFAULT_MARKET_CODE } from '@/shared/config';
 
@@ -11,7 +11,7 @@ export interface ListProductsOptions {
 
 export async function listProducts(options: ListProductsOptions = {}): Promise<Product[]> {
   const { marketCode = DEFAULT_MARKET_CODE, categorySlug, searchQuery, sortBy } = options;
-  const supabase = await createServerClient();
+  const supabase = createPublicClient();
 
   let query = supabase
     .from('products')

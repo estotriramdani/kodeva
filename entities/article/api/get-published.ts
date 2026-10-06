@@ -1,4 +1,4 @@
-import { createServerClient } from '@/shared/api/supabase/server';
+import { createPublicClient } from '@/shared/api/supabase/server';
 import type { Article } from '../model/types';
 import { DEFAULT_MARKET_CODE } from '@/shared/config';
 
@@ -20,7 +20,7 @@ export async function getPublishedArticles(
   options: GetPublishedArticlesOptions = {}
 ): Promise<PaginatedArticlesResult> {
   const { marketCode = DEFAULT_MARKET_CODE, page = 1, pageSize = 6 } = options;
-  const supabase = await createServerClient();
+  const supabase = createPublicClient();
 
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;

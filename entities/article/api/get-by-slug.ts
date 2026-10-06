@@ -1,4 +1,4 @@
-import { createServerClient } from '@/shared/api/supabase/server';
+import { createPublicClient } from '@/shared/api/supabase/server';
 import type { Article } from '../model/types';
 import { DEFAULT_MARKET_CODE } from '@/shared/config';
 
@@ -6,7 +6,7 @@ export async function getArticleBySlug(
   slug: string,
   marketCode: string = DEFAULT_MARKET_CODE
 ): Promise<Article | null> {
-  const supabase = await createServerClient();
+  const supabase = createPublicClient();
 
   const { data, error } = await supabase
     .from('articles')

@@ -1,9 +1,9 @@
-import { createServerClient } from '@/shared/api/supabase/server';
+import { createPublicClient } from '@/shared/api/supabase/server';
 import type { Product, ProductPlan, ProductScreenshot } from '../model/types';
 import { DEFAULT_MARKET_CODE } from '@/shared/config';
 
 export async function getFeaturedProducts(marketCode: string = DEFAULT_MARKET_CODE): Promise<Product[]> {
-  const supabase = await createServerClient();
+  const supabase = createPublicClient();
 
   const { data, error } = await supabase
     .from('products')

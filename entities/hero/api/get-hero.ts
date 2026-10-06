@@ -1,11 +1,11 @@
-import { createServerClient } from '@/shared/api/supabase/server';
+import { createPublicClient } from '@/shared/api/supabase/server';
 import type { LandingHero } from '../model/types';
 import { DEFAULT_MARKET_CODE } from '@/shared/config';
 
 export async function getLandingHero(
   marketCode: string = DEFAULT_MARKET_CODE
 ): Promise<LandingHero | null> {
-  const supabase = await createServerClient();
+  const supabase = createPublicClient();
 
   const { data, error } = await supabase
     .from('landing_hero')

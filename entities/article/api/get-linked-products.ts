@@ -1,8 +1,8 @@
-import { createServerClient } from '@/shared/api/supabase/server';
+import { createPublicClient } from '@/shared/api/supabase/server';
 import type { Product, ProductPlan, ProductScreenshot } from '@/entities/product';
 
 export async function getArticleLinkedProducts(articleId: string): Promise<Product[]> {
-  const supabase = await createServerClient();
+  const supabase = createPublicClient();
 
   const { data, error } = await supabase
     .from('article_products')

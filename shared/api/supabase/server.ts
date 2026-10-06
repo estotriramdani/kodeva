@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import type { Database } from './database.types';
 import { env } from '@/shared/config';
@@ -29,4 +30,18 @@ export async function createClient() {
   );
 }
 
+export function createPublicClient() {
+  return createSupabaseClient<Database>(
+    env.supabaseUrl,
+    env.supabasePublishableKey,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    }
+  );
+}
+
 export { createClient as createServerClient };
+

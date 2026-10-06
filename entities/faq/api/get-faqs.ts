@@ -1,4 +1,4 @@
-import { createServerClient } from '@/shared/api/supabase/server';
+import { createPublicClient } from '@/shared/api/supabase/server';
 import type { Faq } from '../model/types';
 import { DEFAULT_MARKET_CODE } from '@/shared/config';
 
@@ -6,7 +6,7 @@ export async function getFaqs(
   marketCode: string = DEFAULT_MARKET_CODE,
   onlyPublished: boolean = true
 ): Promise<Faq[]> {
-  const supabase = await createServerClient();
+  const supabase = createPublicClient();
 
   let query = supabase
     .from('faqs')

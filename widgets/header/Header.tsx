@@ -2,13 +2,21 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { ShoppingBag, Menu, X } from 'lucide-react';
-import { Button, Container, Modal } from '@/shared/ui';
-import { LeadForm } from '@/features/submit-lead';
+import { Button, Container } from '@/shared/ui';
 import { SITE_CONFIG } from '@/shared/config';
 import { cn } from '@/shared/lib';
 import { useCart } from '@/entities/cart';
+
+const Modal = dynamic(() => import('@/shared/ui').then((m) => m.Modal), {
+  ssr: false,
+});
+const LeadForm = dynamic(
+  () => import('@/features/submit-lead').then((m) => m.LeadForm),
+  { ssr: false }
+);
 
 export function Header() {
   const pathname = usePathname();

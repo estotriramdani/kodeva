@@ -1,7 +1,12 @@
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { Header } from '@/widgets/header';
 import { Footer } from '@/widgets/footer';
-import { CartDrawer, FloatingCartButton } from '@/widgets/cart-drawer';
+import { FloatingCartButton } from '@/widgets/cart-drawer';
+
+const CartDrawer = dynamic(
+  () => import('@/widgets/cart-drawer').then((m) => m.CartDrawer)
+);
 
 export default function MarketingLayout({
   children,

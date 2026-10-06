@@ -12,10 +12,18 @@ import {
   Lock,
   TrendingUp,
 } from 'lucide-react';
-import { Container, Button, Modal } from '@/shared/ui';
+import { Container, Button } from '@/shared/ui';
 import { HeroHeadline, type LandingHero } from '@/entities/hero';
-import { LeadForm } from '@/features/submit-lead';
 import { trackLandingCta } from '@/shared/lib/analytics';
+import dynamic from 'next/dynamic';
+
+const Modal = dynamic(() => import('@/shared/ui').then((m) => m.Modal), {
+  ssr: false,
+});
+const LeadForm = dynamic(
+  () => import('@/features/submit-lead').then((m) => m.LeadForm),
+  { ssr: false }
+);
 
 export interface HeroSectionProps {
   heroData?: LandingHero | null;
