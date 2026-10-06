@@ -235,7 +235,7 @@ Untuk mencegah *Race Condition* (*over-selling* di mana kuota tersisa 1 tetapi 2
 
 Pengukuran performa dilakukan pada **Halaman Beranda (Landing Page)** menggunakan simulasi perangkat seluler (*Mobile Emulation*):
 
-[Detail Hasil Lighthouse (HTML file)](./lighthouse-detail-report.html)
+[Detail Hasil Lighthouse (HTML file)](https://kodeva-tau.vercel.app/lighthouse-detail-report.html)
 
 ![lighthouse-mobile](lighthouse-mobile.png)
 
